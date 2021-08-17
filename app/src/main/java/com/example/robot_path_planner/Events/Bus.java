@@ -1,10 +1,11 @@
 package com.example.robot_path_planner.Events;
 
+import com.example.robot_path_planner.EventBusIndex;
 import org.greenrobot.eventbus.EventBus;
 
 public class Bus {
     public static void init() {
-
+        EventBus.builder().addIndex(new EventBusIndex()).installDefaultEventBus();
     }
 
     public static void exit() {

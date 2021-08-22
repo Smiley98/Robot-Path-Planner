@@ -3,8 +3,9 @@ package com.smiley98.robot_path_planner;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 
 import com.smiley98.robot_path_planner.Events.Bus;
 import com.smiley98.robot_path_planner.Events.Messages.TestEvent;
@@ -18,7 +19,8 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements
+        OnMapReadyCallback, View.OnClickListener {
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private AppCompatButton mBtnTest;
@@ -30,7 +32,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        Bus.post(new TestEvent(5));
+
+        mBtnTest = binding.btnTest;
+        mBtnTest.setOnClickListener(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("fragment_maps");
         mapFragment.getMapAsync(this);
@@ -44,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Subscribe
     public void onTest(TestEvent event) {
-        Log.i(TAG, event.data().toString());
+        Util.toastShort(this, "Testing " + event.data());
     }
 
     @Override
@@ -52,8 +56,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng sydney = new LatLng(43.6426, -79.3846);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker Olympic Park Toronto"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnTest:
+                Bus.post(new TestEvent(123));
+                break;
+        }
     }
 }

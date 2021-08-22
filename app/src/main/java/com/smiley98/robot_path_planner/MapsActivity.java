@@ -1,5 +1,6 @@
 package com.smiley98.robot_path_planner;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentActivity;
 
@@ -7,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.android.gms.maps.model.Marker;
 import com.smiley98.robot_path_planner.Events.Bus;
 import com.smiley98.robot_path_planner.Events.Messages.TestEvent;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +23,8 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 import org.greenrobot.eventbus.Subscribe;
 
 public class MapsActivity extends FragmentActivity implements
-        OnMapReadyCallback, View.OnClickListener {
+    View.OnClickListener,
+    OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private AppCompatButton mBtnTest;
@@ -53,13 +56,17 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         Icons.init(this);
         mMap = googleMap;
+        mMap.setOnMarkerClickListener(this);
 
-        // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(43.6426, -79.3846);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker Olympic Park Toronto").icon(Icons.descriptor(Icons.Type.WAY)));
+        mMap.addMarker(new MarkerOptions()
+            .position(sydney)
+            .icon(Icons.descriptor(Icons.Type.WAY))
+            .anchor(0.5f, 0.5f)
+        );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
     }
 
@@ -71,5 +78,11 @@ public class MapsActivity extends FragmentActivity implements
                 Bus.post(new TestEvent(123));
                 break;
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        Util.toastShort(this, "Marker clicked!");
+        return false;
     }
 }

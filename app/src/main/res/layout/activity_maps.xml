@@ -14,10 +14,31 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnTest"
+        android:id="@+id/btnWay"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
+        android:text="Way"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/fcvEditor"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnBoundary"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:text="Boundary"
+        app:layout_constraintTop_toBottomOf="@id/btnWay"
+        app:layout_constraintStart_toEndOf="@id/fcvEditor"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnObstacle"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:text="Obstacle"
+        app:layout_constraintTop_toBottomOf="@id/btnBoundary"
         app:layout_constraintStart_toEndOf="@id/fcvEditor"
         android:layout_marginTop="12dp"
         android:layout_marginStart="12dp" />

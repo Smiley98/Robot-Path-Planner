@@ -12,11 +12,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.smiley98.robot_path_planner.R;
 
 public class Icons {
-    public enum Type {
-        WAY,
-        BOUNDARY,
-        OBSTACLE
-    }
 
     public static void init(Context context) {
         sWay = draw(context, R.drawable.marker_way);
@@ -24,7 +19,7 @@ public class Icons {
         sObstacle = draw(context, R.drawable.marker_obstacle);
     }
 
-    public static BitmapDescriptor descriptor(Type type) {
+    public static BitmapDescriptor descriptor(Markers.Type type) {
         switch (type) {
             case WAY:
                 return sWay;

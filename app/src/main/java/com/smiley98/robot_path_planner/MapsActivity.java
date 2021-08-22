@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.smiley98.robot_path_planner.Markers.Icons;
 import com.smiley98.robot_path_planner.Markers.Markers;
+import com.smiley98.robot_path_planner.Markers.Tag;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -34,7 +35,7 @@ public class MapsActivity extends FragmentActivity implements
     private AppCompatButton mBtnWay;
     private AppCompatButton mBtnBoundary;
     private AppCompatButton mBtnObstacle;
-    private Icons.Type mMarkerType = Icons.Type.WAY;
+    private Markers.Type mMarkerType = Markers.Type.WAY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,20 +69,15 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap map) {
         Icons.init(this);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6426, -79.3846), 18.0f));
+        map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
-        mMap = googleMap;
-        mMap.setOnMapClickListener(this);
-        mMap.setOnMarkerClickListener(this);
+        map.setOnMapClickListener(this);
+        map.setOnMarkerClickListener(this);
 
-        LatLng defaultLocation = new LatLng(43.6426, -79.3846);
-        /*mMap.addMarker(new MarkerOptions()
-            .position(defaultLocation)
-            .icon(Icons.descriptor(Icons.Type.WAY))
-            .anchor(0.5f, 0.5f)
-        );*/
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 18.0f));
+        mMap = map;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -89,22 +85,22 @@ public class MapsActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnWay:
-                mMarkerType = Icons.Type.WAY;
+                mMarkerType = Markers.Type.WAY;
                 break;
 
             case R.id.btnBoundary:
-                mMarkerType = Icons.Type.BOUNDARY;
+                mMarkerType = Markers.Type.BOUNDARY;
                 break;
 
             case R.id.btnObstacle:
-                mMarkerType = Icons.Type.OBSTACLE;
+                mMarkerType = Markers.Type.OBSTACLE;
                 break;
         }
     }
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
-        Util.toastShort(this, "Marker clicked!");
+        Util.toastShort(this, "Marker " + ((Tag) marker.getTag()).id() + " clicked!");
         return false;
     }
 

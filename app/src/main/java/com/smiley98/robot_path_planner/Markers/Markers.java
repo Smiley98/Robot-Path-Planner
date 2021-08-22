@@ -9,7 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Markers {
-    public void add(Icons.Type type, LatLng position, GoogleMap map) {
+    public enum Type {
+        WAY,
+        BOUNDARY,
+        OBSTACLE
+    }
+
+    public void add(Type type, LatLng position, GoogleMap map) {
         Marker marker = map.addMarker(new MarkerOptions().position(position).icon(Icons.descriptor(type)).anchor(0.5f, 0.5f));
         marker.setTag(new Tag(type, ++mMarkerId));
         switch (type) {
@@ -46,9 +52,9 @@ public class Markers {
         marker.remove();
     }
 
-    private Map<Integer, Marker> mWays = new HashMap<>();
-    private Map<Integer, Marker> mBoundaries = new HashMap<>();
-    private Map<Integer, Marker> mObstacles = new HashMap<>();
+    private Map<Long, Marker> mWays = new HashMap<>();
+    private Map<Long, Marker> mBoundaries = new HashMap<>();
+    private Map<Long, Marker> mObstacles = new HashMap<>();
 
-    private int mMarkerId;
+    private long mMarkerId;
 }

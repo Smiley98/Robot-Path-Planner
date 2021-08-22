@@ -15,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.smiley98.robot_path_planner.Markers.Icons;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -53,11 +54,12 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Icons.init(this);
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(43.6426, -79.3846);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker Olympic Park Toronto"));
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker Olympic Park Toronto").icon(Icons.descriptor(Icons.Type.WAY)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
     }
 

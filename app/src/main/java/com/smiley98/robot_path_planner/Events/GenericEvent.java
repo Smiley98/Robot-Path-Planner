@@ -1,4 +1,4 @@
-package com.example.robot_path_planner.Events;
+package com.smiley98.robot_path_planner.Events;
 
 public class GenericEvent<T> extends Event {
     public GenericEvent(T data) {

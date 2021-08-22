@@ -1,21 +1,20 @@
-package com.example.robot_path_planner;
+package com.smiley98.robot_path_planner;
 
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
-import com.example.robot_path_planner.Events.Bus;
-import com.example.robot_path_planner.Events.Messages.TestEvent;
+import com.smiley98.robot_path_planner.Events.Bus;
+import com.smiley98.robot_path_planner.Events.Messages.TestEvent;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.example.robot_path_planner.databinding.ActivityMapsBinding;
+import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
 

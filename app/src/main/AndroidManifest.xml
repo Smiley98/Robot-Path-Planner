@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.robot_path_planner">
+    package="com.smiley98.robot_path_planner">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
@@ -16,7 +16,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="com.smiley98.robot_path_planner.MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
             <intent-filter>

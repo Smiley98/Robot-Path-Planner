@@ -1,8 +1,8 @@
-package com.example.robot_path_planner;
+package com.smiley98.robot_path_planner;
 
 import android.app.Application;
 
-import com.example.robot_path_planner.Events.Bus;
+import com.smiley98.robot_path_planner.Events.Bus;
 
 public class App extends Application {
 

@@ -1,6 +1,6 @@
-package com.example.robot_path_planner.Events;
+package com.smiley98.robot_path_planner.Events;
 
-import com.example.robot_path_planner.EventBusIndex;
+import com.smiley98.robot_path_planner.EventBusIndex;
 import org.greenrobot.eventbus.EventBus;
 
 public class Bus {

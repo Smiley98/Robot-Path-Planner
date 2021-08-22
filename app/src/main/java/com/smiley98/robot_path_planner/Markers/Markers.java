@@ -15,6 +15,11 @@ public class Markers {
         OBSTACLE
     }
 
+    public enum State {
+        ADD,
+        REMOVE
+    }
+
     public void add(Type type, LatLng position, GoogleMap map) {
         Marker marker = map.addMarker(new MarkerOptions().position(position).icon(Icons.descriptor(type)).anchor(0.5f, 0.5f));
         marker.setTag(new Tag(type, ++mMarkerId));
@@ -34,7 +39,7 @@ public class Markers {
         //return marker;//Ideally marker isn't accessible externally.
     }
 
-    void remove(Marker marker) {
+    public void remove(Marker marker) {
         Tag tag = (Tag) marker.getTag();
         switch (tag.type()) {
             case WAY:
@@ -57,4 +62,17 @@ public class Markers {
     private Map<Long, Marker> mObstacles = new HashMap<>();
 
     private long mMarkerId;
+
+    public static class Tag {
+        public Tag(Type type, long id) {
+            mType = type;
+            mId = id;
+        }
+
+        public Type type() { return mType; }
+        public long id() { return mId; }
+
+        private final Type mType;
+        private final long mId;
+    }
 }

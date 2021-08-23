@@ -29,15 +29,7 @@ public class MapsActivity extends FragmentActivity implements
     private GoogleMap mMap;
     private final Markers mMarkers = new Markers();
 
-    private AppCompatButton mBtnWay;
-    private AppCompatButton mBtnBoundary;
-    private AppCompatButton mBtnObstacle;
-
-    private Markers.State mBtnWayState;
-    private Markers.State mBtnBoundaryState;
-    private Markers.State mBtnObstacleState;
-
-    private Markers.Type mMarkerType = Markers.Type.WAY;
+    private AppCompatButton[] mPointButtons = new AppCompatButton[Markers.Type.values().length];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +39,14 @@ public class MapsActivity extends FragmentActivity implements
         ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        mBtnWay = binding.btnWay;
-        mBtnBoundary = binding.btnBoundary;
-        mBtnObstacle = binding.btnObstacle;
+        mPointButtons[Markers.Type.WAY.ordinal()] = binding.btnWay;
+        mPointButtons[Markers.Type.BOUNDARY.ordinal()] = binding.btnBoundary;
+        mPointButtons[Markers.Type.OBSTACLE.ordinal()] = binding.btnObstacle;
 
-        mBtnWay.setOnClickListener(this);
-        mBtnBoundary.setOnClickListener(this);
-        mBtnObstacle.setOnClickListener(this);
+        for (int i = 0; i < Markers.Type.values().length; i++) {
+            mPointButtons[i].setOnClickListener(this);
+            mPointButtons[i].setOnLongClickListener(this);
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("fragment_maps");
         mapFragment.getMapAsync(this);
@@ -65,37 +58,14 @@ public class MapsActivity extends FragmentActivity implements
         super.onDestroy();
     }
 
-    @Subscribe
-    public void onTest(TestEvent event) {
-        Util.toastShort(this, "Testing " + event.data());
-    }
-
     @Override
     public void onMapClick(@NonNull LatLng latLng) {
-        mMarkers.add(mMarkerType, latLng, mMap);
+        mMarkers.onMapClick(latLng, mMap);
     }
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
-        Markers.Tag tag = (Markers.Tag) marker.getTag();
-        switch (tag.type()) {
-            case WAY:
-                mBtnWayState = Markers.State.REMOVE;
-                mBtnWay.setText("Remove Way Marker");
-                break;
-
-            case BOUNDARY:
-                mBtnBoundaryState = Markers.State.REMOVE;
-                mBtnBoundary.setText("Remove Boundary Marker");
-                break;
-
-            case OBSTACLE:
-                mBtnObstacleState = Markers.State.REMOVE;
-                mBtnObstacle.setText("Remove Obstacle Marker");
-                break;
-        }
-
-        Util.toastShort(this, "Marker " + ((Markers.Tag) marker.getTag()).id() + " clicked!");
+        mMarkers.onMarkerClick(marker, mPointButtons);
         return false;
     }
 
@@ -104,15 +74,15 @@ public class MapsActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnWay:
-                mMarkerType = Markers.Type.WAY;
+                mMarkers.onMarkerButtonClick(mPointButtons, Markers.Type.WAY);
                 break;
 
             case R.id.btnBoundary:
-                mMarkerType = Markers.Type.BOUNDARY;
+                mMarkers.onMarkerButtonClick(mPointButtons, Markers.Type.BOUNDARY);
                 break;
 
             case R.id.btnObstacle:
-                mMarkerType = Markers.Type.OBSTACLE;
+                mMarkers.onMarkerButtonClick(mPointButtons, Markers.Type.OBSTACLE);
                 break;
         }
     }
@@ -122,15 +92,15 @@ public class MapsActivity extends FragmentActivity implements
     public boolean onLongClick(View view) {
         switch (view.getId()) {
             case R.id.btnWay:
-                mMarkerType = Markers.Type.WAY;
+                mMarkers.onMarkerButtonLongClick(mPointButtons, Markers.Type.WAY);
                 break;
 
             case R.id.btnBoundary:
-                mMarkerType = Markers.Type.BOUNDARY;
+                mMarkers.onMarkerButtonLongClick(mPointButtons, Markers.Type.BOUNDARY);
                 break;
 
             case R.id.btnObstacle:
-                mMarkerType = Markers.Type.OBSTACLE;
+                mMarkers.onMarkerButtonLongClick(mPointButtons, Markers.Type.OBSTACLE);
                 break;
         }
         return false;
@@ -139,6 +109,8 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         Icons.init(this);
+        onTest(new TestEvent(123));
+
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6426, -79.3846), 18.0f));
         map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
@@ -148,20 +120,8 @@ public class MapsActivity extends FragmentActivity implements
         mMap = map;
     }
 
-    /*@SuppressLint("NonConstantResourceId")
-    private void setMarkerTypeFromButton(int id) {
-        switch (id) {
-            case R.id.btnWay:
-                mMarkerType = Markers.Type.WAY;
-                break;
-
-            case R.id.btnBoundary:
-                mMarkerType = Markers.Type.BOUNDARY;
-                break;
-
-            case R.id.btnObstacle:
-                mMarkerType = Markers.Type.OBSTACLE;
-                break;
-        }
-    }*/
+    @Subscribe
+    public void onTest(TestEvent event) {
+        Util.toastShort(this, "Testing " + event.data());
+    }
 }

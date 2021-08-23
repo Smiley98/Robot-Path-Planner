@@ -58,8 +58,22 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     @Override
+    public void onMapReady(@NonNull GoogleMap map) {
+        Icons.init(this);
+        onTest(new TestEvent(123));
+
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6426, -79.3846), 18.0f));
+        map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+
+        map.setOnMapClickListener(this);
+        map.setOnMarkerClickListener(this);
+
+        mMap = map;
+    }
+
+    @Override
     public void onMapClick(@NonNull LatLng latLng) {
-        mMarkers.onMapClick(latLng, mMap);
+        mMarkers.onMapClick(latLng, mMap, this);
     }
 
     @Override
@@ -103,20 +117,6 @@ public class MapsActivity extends FragmentActivity implements
                 break;
         }
         return false;
-    }
-
-    @Override
-    public void onMapReady(@NonNull GoogleMap map) {
-        Icons.init(this);
-        onTest(new TestEvent(123));
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6426, -79.3846), 18.0f));
-        map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-
-        map.setOnMapClickListener(this);
-        map.setOnMarkerClickListener(this);
-
-        mMap = map;
     }
 
     @Subscribe

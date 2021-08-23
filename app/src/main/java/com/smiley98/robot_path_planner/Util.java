@@ -4,11 +4,11 @@ import android.content.Context;
 import android.widget.Toast;
 
 public class Util {
-    static void toastShort(Context context, String message) {
+    public static void toastShort(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
-    static void toastLong(Context context, String message) {
+    public static void toastLong(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 }

@@ -7,8 +7,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.smiley98.robot_path_planner.MapsActivity;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -16,10 +16,10 @@ import java.util.TreeMap;
 public class Markers {
     public Markers(AppCompatButton[] buttons) {
         mButtons = buttons;
-        for (int i = 0; i < Type.values().length; i++) {
+
+        for (int i = 0; i < Type.values().length; i++)
             mMarkers[i] = new TreeMap<>();
-            mSelectedMarkers[i] = new WeakReference<>(null);
-        }
+
         setState(State.ADD, Type.OBSTACLE);
         setState(State.ADD, Type.BOUNDARY);
         setState(State.ADD, Type.WAY);
@@ -33,8 +33,8 @@ public class Markers {
     //Set mState to remove on marker click.
     public void onMarkerClick(@NonNull Marker marker) {
         Tag tag = ((Tag) marker.getTag());
-        setState(State.REMOVE, tag.type());
-        mSelectedMarkers[tag.type().ordinal()] = new WeakReference<>(marker);
+        setState(State.REMOVE, tag.mType);
+        mSelectedMarkers[tag.mType.ordinal()] = marker;
     }
 
     //Remove marker (if non-null) and State == REMOVE, or set mAddType to ADD on button click.
@@ -43,7 +43,7 @@ public class Markers {
 
             //References corresponding to marker.
             NavigableMap<Long, Marker> map = mMarkers[type.ordinal()];
-            Marker selected = mSelectedMarkers[type.ordinal()].get();
+            Marker selected = mSelectedMarkers[type.ordinal()];
 
             //Remove the previous marker if it exists.
             if (selected != null)
@@ -71,7 +71,7 @@ public class Markers {
         assert marker != null;
         marker.setTag(new Tag(type, ++mMarkerId));
         mMarkers[type.ordinal()].put(mMarkerId, marker);
-        mSelectedMarkers[type.ordinal()] = new WeakReference<>(marker);
+        mSelectedMarkers[type.ordinal()] = marker;
     }
 
     private void remove(@NonNull Marker marker) {
@@ -79,19 +79,19 @@ public class Markers {
         assert tag != null;
 
         //References corresponding to marker, update selected to previous entry.
-        NavigableMap<Long, Marker> map = mMarkers[tag.type().ordinal()];
-        Map.Entry<Long, Marker> previous = map.lowerEntry(tag.id());
-        mSelectedMarkers[tag.type().ordinal()] = new WeakReference<>(previous == null ? null : previous.getValue());
+        NavigableMap<Long, Marker> map = mMarkers[tag.mType.ordinal()];
+        Map.Entry<Long, Marker> previous = map.lowerEntry(tag.mId);
+        mSelectedMarkers[tag.mType.ordinal()] = previous == null ? null : previous.getValue();
 
         //Do removal.
-        map.remove(tag.id());
+        map.remove(tag.mId);
         marker.remove();
 
         //Set mState to ADD since there's nothing to remove,
         //and change mAddType to type because this is the most recent button press.
         if (map.isEmpty()) {
-            setState(State.ADD, tag.type());
-            mAddType = tag.type();
+            setState(State.ADD, tag.mType);
+            mAddType = tag.mType;
         }
     }
 
@@ -102,7 +102,8 @@ public class Markers {
 
     private final AppCompatButton[] mButtons;
     private final NavigableMap<Long, Marker>[] mMarkers = new TreeMap[Type.values().length];
-    private final WeakReference<Marker>[] mSelectedMarkers = new WeakReference[Type.values().length];
+    private final Marker[] mSelectedMarkers = new Marker[Type.values().length];
+
     private final State[] mStates = new State[Type.values().length];
     private Type mAddType = Type.WAY;
     private long mMarkerId = 0;
@@ -118,16 +119,15 @@ public class Markers {
         REMOVE
     }
 
-    public static class Tag {
+    private static class Tag {
         public Tag(Type type, long id) {
             mType = type;
             mId = id;
         }
 
-        public Type type() { return mType; }
-        public long id() { return mId; }
-
         private final Type mType;
         private final long mId;
     }
+
+    private static final String TAG = MapsActivity.class.getSimpleName();
 }

@@ -14,12 +14,15 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class Markers {
-    public Markers() {
+    public Markers(AppCompatButton[] buttons) {
+        mButtons = buttons;
         for (int i = 0; i < Type.values().length; i++) {
             mMarkers[i] = new TreeMap<>();
             mSelectedMarkers[i] = new WeakReference<>(null);
-            mStates[i] = State.ADD;
         }
+        setState(State.ADD, Type.OBSTACLE);
+        setState(State.ADD, Type.BOUNDARY);
+        setState(State.ADD, Type.WAY);
     }
 
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
@@ -28,14 +31,14 @@ public class Markers {
     }
 
     //Set mState to remove on marker click.
-    public void onMarkerClick(@NonNull Marker marker, AppCompatButton[] buttons) {
+    public void onMarkerClick(@NonNull Marker marker) {
         Tag tag = ((Tag) marker.getTag());
-        setState(State.REMOVE, tag.type(), buttons);
+        setState(State.REMOVE, tag.type());
         mSelectedMarkers[tag.type().ordinal()] = new WeakReference<>(marker);
     }
 
     //Remove marker (if non-null) and State == REMOVE, or set mAddType to ADD on button click.
-    public void onMarkerButtonClick(AppCompatButton[] buttons, Type type) {
+    public void onMarkerButtonClick(Type type) {
         if (mStates[type.ordinal()] == State.REMOVE) {
 
             //References corresponding to marker.
@@ -44,12 +47,12 @@ public class Markers {
 
             //Remove the previous marker if it exists.
             if (selected != null)
-                remove(selected, buttons);
+                remove(selected);
 
             //Remove most recently added marker if there's no selected marker yet markers of said type still exist.
             else if (!map.isEmpty()) {
                 for (Marker marker : map.descendingMap().values()) {
-                    remove(marker, buttons);
+                    remove(marker);
                     break;
                 }
             }
@@ -59,8 +62,8 @@ public class Markers {
     }
 
     //Reset mState to ADD on button long click.
-    public void onMarkerButtonLongClick(AppCompatButton[] buttons, Type type) {
-        setState(State.ADD, type, buttons);
+    public void onMarkerButtonLongClick(Type type) {
+        setState(State.ADD, type);
     }
 
     private void add(Type type, LatLng position, GoogleMap map) {
@@ -71,7 +74,7 @@ public class Markers {
         mSelectedMarkers[type.ordinal()] = new WeakReference<>(marker);
     }
 
-    private void remove(@NonNull Marker marker, AppCompatButton[] buttons) {
+    private void remove(@NonNull Marker marker) {
         Tag tag = (Tag) marker.getTag();
         assert tag != null;
 
@@ -87,16 +90,17 @@ public class Markers {
         //Set mState to ADD since there's nothing to remove,
         //and change mAddType to type because this is the most recent button press.
         if (map.isEmpty()) {
-            setState(State.ADD, tag.type(), buttons);
+            setState(State.ADD, tag.type());
             mAddType = tag.type();
         }
     }
 
-    private void setState(State state, Type type, AppCompatButton[] buttons) {
-        buttons[type.ordinal()].setText((state == State.ADD ? "Add " : "Remove ") + type.toString().toLowerCase() + " point");
+    private void setState(State state, Type type) {
+        mButtons[type.ordinal()].setText((state == State.ADD ? "Add " : "Remove ") + type.toString().toLowerCase() + " point");
         mStates[type.ordinal()] = state;
     }
 
+    private final AppCompatButton[] mButtons;
     private final NavigableMap<Long, Marker>[] mMarkers = new TreeMap[Type.values().length];
     private final WeakReference<Marker>[] mSelectedMarkers = new WeakReference[Type.values().length];
     private final State[] mStates = new State[Type.values().length];

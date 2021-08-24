@@ -19,7 +19,7 @@ public class Icons {
         sObstacle = draw(context, R.drawable.marker_obstacle);
     }
 
-    public static BitmapDescriptor descriptor(Markers.Type type) {
+    public static BitmapDescriptor descriptor(Type type) {
         switch (type) {
             case WAY:
                 return sWay;

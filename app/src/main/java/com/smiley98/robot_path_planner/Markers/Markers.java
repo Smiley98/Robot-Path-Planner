@@ -8,12 +8,10 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.smiley98.robot_path_planner.MapsActivity;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
@@ -42,8 +40,8 @@ public class Markers extends MarkersBase {
     //Set mState to remove and reassign selected on marker click.
     public void onMarkerClick(@NonNull Marker marker) {
         Tag tag = ((Tag) marker.getTag());
-        mSelectedKeys[tag.mType.ordinal()] = tag.mId;
-        setState(State.REMOVE, tag.mType);
+        mSelectedKeys[tag.type().ordinal()] = tag.id();
+        setState(State.REMOVE, tag.type());
     }
 
     //Remove marker (if non-null) and State == REMOVE, or set mAddType to ADD on button click.

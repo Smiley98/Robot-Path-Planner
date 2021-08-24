@@ -18,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.smiley98.robot_path_planner.Markers.Icons;
 import com.smiley98.robot_path_planner.Markers.Markers;
+import com.smiley98.robot_path_planner.Markers.Type;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -37,11 +38,11 @@ public class MapsActivity extends FragmentActivity implements
         ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        AppCompatButton[] pointButtons = new AppCompatButton[Markers.Type.values().length];
-        pointButtons[Markers.Type.WAY.ordinal()] = binding.btnWay;
-        pointButtons[Markers.Type.BOUNDARY.ordinal()] = binding.btnBoundary;
-        pointButtons[Markers.Type.OBSTACLE.ordinal()] = binding.btnObstacle;
-        for (int i = 0; i < Markers.Type.values().length; i++) {
+        AppCompatButton[] pointButtons = new AppCompatButton[Type.values().length];
+        pointButtons[Type.WAY.ordinal()] = binding.btnWay;
+        pointButtons[Type.BOUNDARY.ordinal()] = binding.btnBoundary;
+        pointButtons[Type.OBSTACLE.ordinal()] = binding.btnObstacle;
+        for (int i = 0; i < Type.values().length; i++) {
             pointButtons[i].setOnClickListener(this);
             pointButtons[i].setOnLongClickListener(this);
         }
@@ -87,15 +88,15 @@ public class MapsActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnWay:
-                mMarkers.onMarkerButtonClick(Markers.Type.WAY);
+                mMarkers.onMarkerButtonClick(Type.WAY);
                 break;
 
             case R.id.btnBoundary:
-                mMarkers.onMarkerButtonClick(Markers.Type.BOUNDARY);
+                mMarkers.onMarkerButtonClick(Type.BOUNDARY);
                 break;
 
             case R.id.btnObstacle:
-                mMarkers.onMarkerButtonClick(Markers.Type.OBSTACLE);
+                mMarkers.onMarkerButtonClick(Type.OBSTACLE);
                 break;
         }
     }
@@ -105,15 +106,15 @@ public class MapsActivity extends FragmentActivity implements
     public boolean onLongClick(View view) {
         switch (view.getId()) {
             case R.id.btnWay:
-                mMarkers.onMarkerButtonLongClick(Markers.Type.WAY);
+                mMarkers.onMarkerButtonLongClick(Type.WAY);
                 break;
 
             case R.id.btnBoundary:
-                mMarkers.onMarkerButtonLongClick(Markers.Type.BOUNDARY);
+                mMarkers.onMarkerButtonLongClick(Type.BOUNDARY);
                 break;
 
             case R.id.btnObstacle:
-                mMarkers.onMarkerButtonLongClick(Markers.Type.OBSTACLE);
+                mMarkers.onMarkerButtonLongClick(Type.OBSTACLE);
                 break;
         }
         return false;

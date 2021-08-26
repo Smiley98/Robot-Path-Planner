@@ -8,12 +8,11 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Markers.IMarkers;
-import com.smiley98.robot_path_planner.Markers.Type;
+import com.smiley98.robot_path_planner.Markers.State;
 
 import java.util.ArrayList;
 
-public class Obstacles implements IMarkers {
+public class Obstacles implements IMarkerOperations {
     public Obstacles(AppCompatButton button) {
         mButton = button;
     }
@@ -29,15 +28,16 @@ public class Obstacles implements IMarkers {
     }
 
     @Override
-    public void onMarkerButtonClick(Type type) {
+    public void onMarkerButtonClick() {
 
     }
 
     @Override
-    public void onMarkerButtonLongClick(Type type) {
+    public void onMarkerButtonLongClick() {
 
     }
 
     private AppCompatButton mButton;
+    private State mState = State.ADD;
     private ArrayList<ArrayList<Marker>> mObstacles = new ArrayList<>();
 }

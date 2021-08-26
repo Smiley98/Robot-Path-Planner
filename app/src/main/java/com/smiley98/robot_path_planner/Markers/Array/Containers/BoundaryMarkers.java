@@ -3,35 +3,41 @@ package com.smiley98.robot_path_planner.Markers.Array.Containers;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Markers.IMarkers;
-import com.smiley98.robot_path_planner.Markers.Type;
+import com.smiley98.robot_path_planner.Markers.State;
 
 import java.util.ArrayList;
 
 public class BoundaryMarkers implements IMarkerOperations {
+    public BoundaryMarkers(AppCompatButton button) {
+        mButton = button;
+    }
+
     @Override
-    public Type onMapClick(@NonNull LatLng latLng, GoogleMap map, Context context) {
+    public void onMapClick(@NonNull LatLng latLng, GoogleMap map, Context context) {
 
     }
 
     @Override
-    public Type onMarkerClick(@NonNull Marker marker) {
+    public void onMarkerClick(@NonNull Marker marker) {
 
     }
 
     @Override
-    public Type onMarkerButtonClick(Type type) {
+    public void onMarkerButtonClick() {
 
     }
 
     @Override
-    public Type onMarkerButtonLongClick(Type type) {
+    public void onMarkerButtonLongClick() {
 
     }
 
+    private AppCompatButton mButton;
+    private State mState = State.ADD;
     private ArrayList<Marker> mMarkers = new ArrayList<>();
 }

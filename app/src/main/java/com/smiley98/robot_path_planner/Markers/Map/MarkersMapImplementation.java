@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.smiley98.robot_path_planner.MapsActivity;
 import com.smiley98.robot_path_planner.Markers.IMarkers;
+import com.smiley98.robot_path_planner.Markers.State;
 import com.smiley98.robot_path_planner.Markers.Tag;
 import com.smiley98.robot_path_planner.Markers.Type;
 import com.smiley98.robot_path_planner.R;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+/*DEPRECATED*/
 //This class serves as a reference for how to achieve basic operations (add & remove without complex cases).
 //Learned the hard way that my editor should use an array-like container as elements need to be logically contiguous.
 public class MarkersMapImplementation extends MarkersMapBase implements IMarkers {
@@ -150,11 +152,6 @@ public class MarkersMapImplementation extends MarkersMapBase implements IMarkers
 
     private final State[] mStates = new State[Type.values().length];
     private Type mAddType = Type.WAY;
-
-    private enum State {
-        ADD,
-        REMOVE
-    }
 
     private static final String TAG = MapsActivity.class.getSimpleName();
 }

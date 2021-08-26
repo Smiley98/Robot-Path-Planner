@@ -12,7 +12,10 @@ import com.smiley98.robot_path_planner.Markers.Type;
 import java.util.Map;
 import java.util.NavigableMap;
 
-public class MapMarkerBase {
+/*DEPRECATED*/
+//This class serves as a reference.
+//Too simplistic. WAY, BOUNDARY and OBSTACLE are too different to have common add & remove operations.
+public class MarkersMapBase {
 
     //Returns the key of the added marker.
     protected static Long add(NavigableMap<Long, Marker> markers, Type type, LatLng position, GoogleMap map) {

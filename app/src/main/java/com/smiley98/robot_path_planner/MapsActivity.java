@@ -18,7 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.smiley98.robot_path_planner.Markers.IMarkers;
 import com.smiley98.robot_path_planner.Markers.Icons;
-import com.smiley98.robot_path_planner.Markers.Map.MapMarkerImplementation;
+import com.smiley98.robot_path_planner.Markers.Map.MarkersMapImplementation;
 import com.smiley98.robot_path_planner.Markers.Type;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
@@ -48,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements
             pointButtons[i].setOnLongClickListener(this);
         }
 
-        mMarkers = new MapMarkerImplementation(pointButtons);
+        mMarkers = new MarkersMapImplementation(pointButtons);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("fragment_maps");
         mapFragment.getMapAsync(this);
     }

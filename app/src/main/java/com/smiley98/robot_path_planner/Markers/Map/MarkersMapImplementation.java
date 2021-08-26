@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-public class MapMarkerImplementation extends MapMarkerBase implements IMarkers {
-    public MapMarkerImplementation(AppCompatButton[] buttons) {
+//This class serves as a reference for how to achieve basic operations (add & remove without complex cases).
+//Learned the hard way that my editor should use an array-like container as elements need to be logically contiguous.
+public class MarkersMapImplementation extends MarkersMapBase implements IMarkers {
+    public MarkersMapImplementation(AppCompatButton[] buttons) {
         mButtons = buttons;
 
         for (int i = 0; i < Type.values().length; i++)
@@ -156,17 +158,3 @@ public class MapMarkerImplementation extends MapMarkerBase implements IMarkers {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
 }
-
-/*private int colour(Type type, Context context) {
-    switch (type) {
-        case WAY:
-            return context.getColor(R.color.cyan);
-
-        case BOUNDARY:
-            return context.getColor(R.color.red);
-
-        case OBSTACLE:
-            return context.getColor(R.color.green);
-    }
-    return 0;
-}*/

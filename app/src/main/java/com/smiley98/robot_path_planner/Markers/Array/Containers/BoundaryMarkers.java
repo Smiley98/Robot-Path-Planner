@@ -19,7 +19,7 @@ public class BoundaryMarkers implements IMarkerOperations {
 
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map, Context context) {
-
+        
     }
 
     @Override
@@ -40,4 +40,5 @@ public class BoundaryMarkers implements IMarkerOperations {
     private AppCompatButton mButton;
     private State mState = State.ADD;
     private ArrayList<Marker> mMarkers = new ArrayList<>();
+    private Integer mSelected = null;
 }

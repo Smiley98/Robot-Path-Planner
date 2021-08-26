@@ -24,7 +24,7 @@ public class WayMarkers implements IMarkerOperations {
 
     @Override
     public void onMarkerClick(@NonNull Marker marker) {
-
+        setState(State.REMOVE);
     }
 
     @Override
@@ -34,10 +34,22 @@ public class WayMarkers implements IMarkerOperations {
 
     @Override
     public void onMarkerButtonLongClick() {
+        setState(State.ADD);
+    }
 
+    private void setState(State state) {
+        switch (state) {
+            case ADD:
+                break;
+
+            case REMOVE:
+                break;
+        }
+        mState = state;
     }
 
     private AppCompatButton mButton;
     private State mState = State.ADD;
     private ArrayList<Marker> mMarkers = new ArrayList<>();
+    private Integer mSelected = null;
 }

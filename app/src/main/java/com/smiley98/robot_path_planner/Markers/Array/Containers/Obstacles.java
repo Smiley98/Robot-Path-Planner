@@ -24,7 +24,7 @@ public class Obstacles implements IMarkerOperations {
 
     @Override
     public void onMarkerClick(@NonNull Marker marker) {
-
+        setState(State.REMOVE);
     }
 
     @Override
@@ -34,7 +34,18 @@ public class Obstacles implements IMarkerOperations {
 
     @Override
     public void onMarkerButtonLongClick() {
+        setState(State.ADD);
+    }
 
+    private void setState(State state) {
+        switch (state) {
+            case ADD:
+                break;
+
+            case REMOVE:
+                break;
+        }
+        mState = state;
     }
 
     private AppCompatButton mButton;

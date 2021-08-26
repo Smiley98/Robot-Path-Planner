@@ -3,6 +3,7 @@ package com.smiley98.robot_path_planner.Markers.Array;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,10 +19,10 @@ import java.util.Objects;
 
 public class MarkersArrayImplementation implements IMarkers {
 
-    public MarkersArrayImplementation() {
-        mMarkers[Type.WAY.ordinal()] = new WayMarkers();
-        mMarkers[Type.BOUNDARY.ordinal()] = new BoundaryMarkers();
-        mMarkers[Type.OBSTACLE.ordinal()] = new Obstacles();
+    public MarkersArrayImplementation(AppCompatButton[] markerButtons) {
+        mMarkers[Type.WAY.ordinal()] = new WayMarkers(markerButtons[Type.WAY.ordinal()]);
+        mMarkers[Type.BOUNDARY.ordinal()] = new BoundaryMarkers(markerButtons[Type.BOUNDARY.ordinal()]);
+        mMarkers[Type.OBSTACLE.ordinal()] = new Obstacles(markerButtons[Type.OBSTACLE.ordinal()]);
     }
 
     @Override

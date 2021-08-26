@@ -1,19 +1,22 @@
-package com.smiley98.robot_path_planner.Markers;
+package com.smiley98.robot_path_planner.Markers.Map;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.smiley98.robot_path_planner.Markers.MarkerFactory;
+import com.smiley98.robot_path_planner.Markers.Tag;
+import com.smiley98.robot_path_planner.Markers.Type;
 
 import java.util.Map;
 import java.util.NavigableMap;
 
-public class MarkersBase {
+public class MapMarkerBase {
 
     //Returns the key of the added marker.
     protected static Long add(NavigableMap<Long, Marker> markers, Type type, LatLng position, GoogleMap map) {
-        Marker marker = MarkerFactory.create(type, position, map);
+        Marker marker = sFactory.create(type, position, map);
         Long id = ((Tag) marker.getTag()).id();
         markers.put(id, marker);
         return id;
@@ -28,4 +31,6 @@ public class MarkersBase {
         marker.remove();
         return previous == null ? null : previous.getKey();
     }
+
+    private static final MarkerFactory sFactory = new MarkerFactory();
 }

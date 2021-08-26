@@ -6,12 +6,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MarkerFactory {
-    public static Marker create(Type type, LatLng position, GoogleMap map) {
+    public Marker create(Type type, LatLng position, GoogleMap map) {
         Marker marker = map.addMarker(new MarkerOptions().position(position).icon(Icons.descriptor(type)).anchor(0.5f, 0.5f));
         assert marker != null;
-        marker.setTag(new Tag(type, ++sId));
+        marker.setTag(new Tag(type, ++mId));
         return marker;
     }
     
-    private static long sId = 0L;
+    private long mId = 0L;
 }

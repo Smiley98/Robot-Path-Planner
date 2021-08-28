@@ -26,54 +26,26 @@ public class WayMarkers implements IMarkerOperations {
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map, Context context) {
         if (mState == State.ADD)
-            add(latLng, map);
+            mMarkers.add(latLng, map);
     }
 
     @Override
     public void onMarkerClick(@NonNull Marker marker) {
         setState(State.REMOVE);
-        if (mSelected != null)
-            mSelected.setIcon(Icons.normal(Type.WAY));
-        setSelected(marker);
+        if (mMarkers.selected() != null)
+            mMarkers.selected().setIcon(Icons.normal(Type.WAY));
+        mMarkers.setSelected(marker);
     }
 
-    //Remove selected marker if it exists.
     @Override
     public void onMarkerButtonClick() {
-        if (mState == State.REMOVE && mSelected != null)
-            remove(mMarkers.indexOf(mSelected));
+        if (mState == State.REMOVE && mMarkers.selected() != null)
+            mMarkers.remove(mMarkers.selected());
     }
 
-    //Reset state to ADD.
     @Override
     public void onMarkerButtonLongClick() {
         setState(State.ADD);
-    }
-
-    //If the selected marker exists, revert its icon and set selected to its successor.
-    //Otherwise append to back and assign to selected.
-    private void add(LatLng latlng, GoogleMap map) {
-        Marker marker = MarkerFactory.create(Type.WAY, latlng, map);
-        if (mSelected == null)
-            mMarkers.add(marker);
-        else {
-            mSelected.setIcon(Icons.normal(Type.WAY));
-            mMarkers.add(mMarkers.indexOf(mSelected), marker);
-        }
-        setSelected(marker);
-    }
-
-    //If the selected marker is being removed, assign the previous marker to selected.
-    private void remove(int index) {
-        if (mMarkers.get(index).equals(mSelected))
-            setSelected(mMarkers.size() > 1 ? mMarkers.get(index - 1) : null);
-        mMarkers.remove(index);
-    }
-
-    private void setSelected(@Nullable Marker marker) {
-        mSelected = marker;
-        if (mSelected != null)
-            mSelected.setIcon(Icons.selected(Type.WAY));
     }
 
     private void setState(State state) {
@@ -89,8 +61,7 @@ public class WayMarkers implements IMarkerOperations {
         mState = state;
     }
 
+    private final MarkerContainer mMarkers = new MarkerContainer(Type.WAY);
     private final AppCompatButton mButton;
-    private final ArrayList<Marker> mMarkers = new ArrayList<>();
-    private Marker mSelected = null;
     private State mState;
 }

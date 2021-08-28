@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Markers.MarkerFactory;
+import com.smiley98.robot_path_planner.Markers.LegacyMarkerFactory;
 import com.smiley98.robot_path_planner.Markers.Tag;
 import com.smiley98.robot_path_planner.Markers.Type;
 
@@ -35,5 +35,5 @@ public class MarkersMapBase {
         return previous == null ? null : previous.getKey();
     }
 
-    private static final MarkerFactory sFactory = new MarkerFactory();
+    private static final LegacyMarkerFactory sFactory = new LegacyMarkerFactory();
 }

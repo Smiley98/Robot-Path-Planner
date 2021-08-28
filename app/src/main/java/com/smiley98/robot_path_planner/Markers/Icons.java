@@ -14,28 +14,20 @@ import com.smiley98.robot_path_planner.R;
 public class Icons {
 
     public static void init(Context context) {
-        sWay = draw(context, R.drawable.marker_way);
-        sBoundary = draw(context, R.drawable.marker_boundary);
-        sObstacle = draw(context, R.drawable.marker_obstacle);
+        sNormal[Type.WAY.ordinal()] = draw(context, R.drawable.marker_way);
+        sNormal[Type.BOUNDARY.ordinal()] = draw(context, R.drawable.marker_boundary);
+        sNormal[Type.OBSTACLE.ordinal()] = draw(context, R.drawable.marker_obstacle);
+
+        sSelected[Type.WAY.ordinal()] = draw(context, R.drawable.marker_way_selected);
+        sSelected[Type.BOUNDARY.ordinal()] = draw(context, R.drawable.marker_boundary_selected);
+        sSelected[Type.OBSTACLE.ordinal()] = draw(context, R.drawable.marker_obstacle_selected);
     }
 
-    public static BitmapDescriptor descriptor(Type type) {
-        switch (type) {
-            case WAY:
-                return sWay;
+    public static BitmapDescriptor normal(Type type) { return sSelected[type.ordinal()]; }
+    public static BitmapDescriptor selected(Type type) { return sNormal[type.ordinal()]; }
 
-            case BOUNDARY:
-                return sBoundary;
-
-            case OBSTACLE:
-                return sObstacle;
-        }
-        return null;
-    }
-
-    private static BitmapDescriptor sWay;
-    private static BitmapDescriptor sBoundary;
-    private static BitmapDescriptor sObstacle;
+    private static final BitmapDescriptor[] sNormal = new BitmapDescriptor[Type.values().length];
+    private static final BitmapDescriptor[] sSelected = new BitmapDescriptor[Type.values().length];
 
     private static BitmapDescriptor draw(Context context, int id) {
         Drawable icon = ContextCompat.getDrawable(context, id);

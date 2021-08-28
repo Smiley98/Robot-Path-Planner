@@ -15,16 +15,17 @@ import java.util.ArrayList;
 public class BoundaryMarkers implements IMarkerOperations {
     public BoundaryMarkers(AppCompatButton button) {
         mButton = button;
+        setState(State.ADD);
     }
 
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map, Context context) {
-        
+
     }
 
     @Override
     public void onMarkerClick(@NonNull Marker marker) {
-
+        setState(State.REMOVE);
     }
 
     @Override
@@ -34,7 +35,20 @@ public class BoundaryMarkers implements IMarkerOperations {
 
     @Override
     public void onMarkerButtonLongClick() {
+        setState(State.ADD);
+    }
 
+    private void setState(State state) {
+        switch (state) {
+            case ADD:
+                mButton.setText("Add Boundary Point");
+                break;
+
+            case REMOVE:
+                mButton.setText("Remove Boundary Point");
+                break;
+        }
+        mState = state;
     }
 
     private AppCompatButton mButton;

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class Obstacles implements IMarkerOperations {
     public Obstacles(AppCompatButton button) {
         mButton = button;
+        setState(State.ADD);
     }
 
     @Override
@@ -40,9 +41,11 @@ public class Obstacles implements IMarkerOperations {
     private void setState(State state) {
         switch (state) {
             case ADD:
+                mButton.setText("Add Obstacle Point");
                 break;
 
             case REMOVE:
+                mButton.setText("Remove Obstacle Point");
                 break;
         }
         mState = state;

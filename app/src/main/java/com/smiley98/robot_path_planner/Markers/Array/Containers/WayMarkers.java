@@ -39,8 +39,11 @@ public class WayMarkers implements IMarkerOperations {
 
     @Override
     public void onMarkerButtonClick() {
-        if (mState == State.REMOVE && mMarkers.selected() != null)
+        if (mState == State.REMOVE) {
+            if (mMarkers.selected() == null && mMarkers.size() > 0)
+                mMarkers.setSelected(mMarkers.get(mMarkers.size() - 1));
             mMarkers.remove(mMarkers.selected());
+        }
     }
 
     @Override

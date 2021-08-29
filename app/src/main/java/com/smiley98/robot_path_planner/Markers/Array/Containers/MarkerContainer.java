@@ -17,6 +17,8 @@ public class MarkerContainer {
 
     public Type type() { return mType; }
     public Marker selected() { return mSelected; }
+    public Marker get(int index) { return mMarkers.get(index); }
+    public int size() { return mMarkers.size(); }
 
     public void setSelected(@Nullable Marker marker) {
         mSelected = marker;
@@ -36,10 +38,21 @@ public class MarkerContainer {
     }
 
     public void remove(@NonNull Marker marker) {
-        int index = mMarkers.indexOf(marker);
         if (marker.equals(mSelected))
-            setSelected(mMarkers.size() > 1 ? mMarkers.get(index - 1) : null);
-        mMarkers.remove(index);
+            setSelected(previous(marker));
+        mMarkers.remove(marker);
+    }
+
+    private Marker previous(@NonNull Marker marker) {
+        int index = mMarkers.indexOf(marker);
+        if (index == -1 || mMarkers.size() <= 1) return null;
+        return index == 0 ? mMarkers.get(mMarkers.size() - 1) : mMarkers.get(index - 1);
+    }
+
+    private Marker next(@NonNull Marker marker) {
+        int index = mMarkers.indexOf(marker);
+        if (index == -1 || mMarkers.size() <= 1) return null;
+        return index == mMarkers.size() - 1 ? mMarkers.get(0) : mMarkers.get(index + 1);
     }
 
     private final ArrayList<Marker> mMarkers = new ArrayList<>();

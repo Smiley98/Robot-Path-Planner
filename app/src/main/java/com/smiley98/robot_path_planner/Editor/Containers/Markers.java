@@ -13,8 +13,8 @@ import com.smiley98.robot_path_planner.Editor.Common.Type;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class MarkerContainer {
-    public MarkerContainer(Type type) { mType = type; }
+public class Markers {
+    public Markers(Type type) { mType = type; }
 
     public Type type() { return mType; }
     public Marker selected() { return mSelected; }
@@ -67,5 +67,5 @@ public class MarkerContainer {
     private final ArrayList<Marker> mMarkers = new ArrayList<>();
     private Marker mSelected = null;
     private final Type mType;
-    private static final String TAG = MarkerContainer.class.getSimpleName();
+    private static final String TAG = Markers.class.getSimpleName();
 }

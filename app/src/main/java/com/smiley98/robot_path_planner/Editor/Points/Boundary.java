@@ -6,12 +6,13 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Editor.Containers.LineContainer;
-import com.smiley98.robot_path_planner.Editor.Containers.MarkerContainer;
+import com.smiley98.robot_path_planner.Editor.Containers.Lines;
+import com.smiley98.robot_path_planner.Editor.Containers.Markers;
 import com.smiley98.robot_path_planner.Editor.Common.Icons;
 import com.smiley98.robot_path_planner.Editor.Common.State;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
-import com.smiley98.robot_path_planner.Editor.IPoint;
+import com.smiley98.robot_path_planner.Editor.Containers.Polygon;
+import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
 
 public class Boundary implements IPoint {
     public Boundary(AppCompatButton button) {
@@ -23,7 +24,8 @@ public class Boundary implements IPoint {
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
         if (mState == State.ADD) {
             mMarkers.add(latLng, map);
-            mLines.add(mMarkers.points(), map, mButton.getContext());
+            mLines.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
+            mPolygon.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
         }
     }
 
@@ -41,7 +43,8 @@ public class Boundary implements IPoint {
             if (mMarkers.selected() == null)
                 mMarkers.setSelected(mMarkers.get(mMarkers.size() - 1));
             mMarkers.remove(mMarkers.selected());
-            mLines.update(mMarkers.points());
+            mLines.onMarkerRemoved(mMarkers.points());
+            mPolygon.onMarkerRemoved(mMarkers.points());
 
             if (mMarkers.size() == 0)
                 setState(State.ADD);
@@ -66,8 +69,9 @@ public class Boundary implements IPoint {
         mState = state;
     }
 
-    private final MarkerContainer mMarkers = new MarkerContainer(Type.BOUNDARY);
-    private final LineContainer mLines = new LineContainer(Type.BOUNDARY);
+    private final Markers mMarkers = new Markers(Type.BOUNDARY);
+    private final Lines mLines = new Lines(Type.BOUNDARY);
+    private final Polygon mPolygon = new Polygon(Type.BOUNDARY);
     private final AppCompatButton mButton;
     private State mState;
 }

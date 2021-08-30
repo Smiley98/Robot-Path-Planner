@@ -6,8 +6,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Editor.Containers.LineContainer;
-import com.smiley98.robot_path_planner.Editor.Containers.MarkerContainer;
+import com.smiley98.robot_path_planner.Editor.Containers.Lines;
+import com.smiley98.robot_path_planner.Editor.Containers.Markers;
 import com.smiley98.robot_path_planner.Editor.Common.Icons;
 import com.smiley98.robot_path_planner.Editor.Common.State;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
@@ -23,7 +23,7 @@ public class Way implements IPoint {
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
         if (mState == State.ADD) {
             mMarkers.add(latLng, map);
-            mLines.add(mMarkers.points(), map, mButton.getContext());
+            mLines.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
         }
     }
 
@@ -41,7 +41,7 @@ public class Way implements IPoint {
             if (mMarkers.selected() == null )
                 mMarkers.setSelected(mMarkers.get(mMarkers.size() - 1));
             mMarkers.remove(mMarkers.selected());
-            mLines.update(mMarkers.points());
+            mLines.onMarkerRemoved(mMarkers.points());
 
             if (mMarkers.size() == 0)
                 setState(State.ADD);
@@ -66,8 +66,8 @@ public class Way implements IPoint {
         mState = state;
     }
 
-    private final MarkerContainer mMarkers = new MarkerContainer(Type.WAY);
-    private final LineContainer mLines = new LineContainer(Type.WAY);
+    private final Markers mMarkers = new Markers(Type.WAY);
+    private final Lines mLines = new Lines(Type.WAY);
     private final AppCompatButton mButton;
     private State mState;
 }

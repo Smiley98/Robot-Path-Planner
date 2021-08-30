@@ -12,19 +12,18 @@ import com.smiley98.robot_path_planner.R;
 
 import java.util.List;
 
-public class LineContainer {
-    public LineContainer(Type type) {
+public class Lines {
+    public Lines(Type type) {
         mType = type;
     }
 
-    public void add(List<LatLng> points, GoogleMap map, Context context) {
+    public void onMarkerAdded(List<LatLng> points, GoogleMap map, Context context) {
         if (mLine == null)
-            mLine = map.addPolyline(options(context).addAll(points));
-        else
-            mLine.setPoints(points);
+            mLine = map.addPolyline(options(context));
+        mLine.setPoints(points);
     }
 
-    public void update(List<LatLng> points) {
+    public void onMarkerRemoved(List<LatLng> points) {
         mLine.setPoints(points);
     }
 

@@ -51,6 +51,13 @@ public class MarkerContainer {
         marker.remove();
     }
 
+    public ArrayList<LatLng> points() {
+        ArrayList<LatLng> result = new ArrayList<>();
+        for (Marker marker : mMarkers)
+            result.add(marker.getPosition());
+        return result;
+    }
+
     private Marker previous(@Nullable Marker marker) {
         int index = mMarkers.indexOf(marker);
         if (index == -1 || mMarkers.size() <= 1) return null;

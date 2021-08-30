@@ -19,8 +19,10 @@ public class WayMarkers implements IMarkerContainers {
 
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
-        if (mState == State.ADD)
+        if (mState == State.ADD) {
             mMarkers.add(latLng, map);
+            mLines.add(mMarkers.points(), map, mButton.getContext());
+        }
     }
 
     @Override
@@ -37,6 +39,7 @@ public class WayMarkers implements IMarkerContainers {
             if (mMarkers.selected() == null )
                 mMarkers.setSelected(mMarkers.get(mMarkers.size() - 1));
             mMarkers.remove(mMarkers.selected());
+            mLines.update(mMarkers.points());
 
             if (mMarkers.size() == 0)
                 setState(State.ADD);
@@ -62,6 +65,7 @@ public class WayMarkers implements IMarkerContainers {
     }
 
     private final MarkerContainer mMarkers = new MarkerContainer(Type.WAY);
+    private final LineContainer mLines = new LineContainer(Type.WAY);
     private final AppCompatButton mButton;
     private State mState;
 }

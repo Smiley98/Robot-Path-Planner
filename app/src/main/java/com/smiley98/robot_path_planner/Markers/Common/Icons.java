@@ -1,4 +1,4 @@
-package com.smiley98.robot_path_planner.Markers;
+package com.smiley98.robot_path_planner.Markers.Common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,8 +23,8 @@ public class Icons {
         sSelected[Type.OBSTACLE.ordinal()] = draw(context, R.drawable.marker_obstacle_selected);
     }
 
-    public static BitmapDescriptor normal(Type type) { return sSelected[type.ordinal()]; }
-    public static BitmapDescriptor selected(Type type) { return sNormal[type.ordinal()]; }
+    public static BitmapDescriptor normal(Type type) { return sNormal[type.ordinal()]; }
+    public static BitmapDescriptor selected(Type type) { return sSelected[type.ordinal()]; }
 
     private static final BitmapDescriptor[] sNormal = new BitmapDescriptor[Type.values().length];
     private static final BitmapDescriptor[] sSelected = new BitmapDescriptor[Type.values().length];

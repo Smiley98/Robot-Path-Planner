@@ -16,10 +16,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.smiley98.robot_path_planner.Markers.IMarkers;
-import com.smiley98.robot_path_planner.Markers.Icons;
-import com.smiley98.robot_path_planner.Markers.Map.MarkersMapImplementation;
-import com.smiley98.robot_path_planner.Markers.Type;
+import com.smiley98.robot_path_planner.Markers.Markers;
+import com.smiley98.robot_path_planner.Markers.Interfaces.IMarkers;
+import com.smiley98.robot_path_planner.Markers.Common.Icons;
+import com.smiley98.robot_path_planner.Markers.Common.Type;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -48,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements
             pointButtons[i].setOnLongClickListener(this);
         }
 
-        mMarkers = new MarkersMapImplementation(pointButtons);
+        mMarkers = new Markers(pointButtons);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("fragment_maps");
         mapFragment.getMapAsync(this);
     }
@@ -75,7 +75,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onMapClick(@NonNull LatLng latLng) {
-        mMarkers.onMapClick(latLng, mMap, this);
+        mMarkers.onMapClick(latLng, mMap);
     }
 
     @Override

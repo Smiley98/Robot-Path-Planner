@@ -1,4 +1,4 @@
-package com.smiley98.robot_path_planner.Markers.Containers;
+package com.smiley98.robot_path_planner.Editor.Containers;
 
 import android.content.Context;
 
@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.smiley98.robot_path_planner.Markers.Common.Type;
+import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.R;
 
 import java.util.List;

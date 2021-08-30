@@ -1,4 +1,4 @@
-package com.smiley98.robot_path_planner.Markers.Common;
+package com.smiley98.robot_path_planner.Editor.Common;
 
 public enum Type {
         WAY,

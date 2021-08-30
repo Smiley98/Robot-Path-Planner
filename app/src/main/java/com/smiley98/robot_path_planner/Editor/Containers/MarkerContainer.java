@@ -1,4 +1,4 @@
-package com.smiley98.robot_path_planner.Markers.Containers;
+package com.smiley98.robot_path_planner.Editor.Containers;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -7,8 +7,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.smiley98.robot_path_planner.Markers.Common.Icons;
-import com.smiley98.robot_path_planner.Markers.Common.Type;
+import com.smiley98.robot_path_planner.Editor.Common.Icons;
+import com.smiley98.robot_path_planner.Editor.Common.Type;
 
 import java.util.ArrayList;
 import java.util.Objects;

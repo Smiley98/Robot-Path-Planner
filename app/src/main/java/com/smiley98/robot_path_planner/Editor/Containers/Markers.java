@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.smiley98.robot_path_planner.Editor.Common.Icons;
+import com.smiley98.robot_path_planner.Editor.Common.Tag;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 
 import java.util.ArrayList;
@@ -22,31 +23,46 @@ public class Markers {
     public int size() { return mMarkers.size(); }
 
     public void setSelected(@Nullable Marker marker) {
+        //Revert previously selected icon.
+        if (mSelected != null)
+            mSelected.setIcon(Icons.normal(mType));
+
         mSelected = marker;
+
+        //Update newly selected icon.
         if (mSelected != null)
             mSelected.setIcon(Icons.selected(mType));
     }
 
     public void add(LatLng latlng, GoogleMap map) {
         Marker marker = Objects.requireNonNull(map.addMarker(new MarkerOptions().position(latlng).icon(Icons.normal(mType)).anchor(0.5f, 0.5f)));
-        marker.setTag(mType);
+        marker.setTag(new Tag(mType));
 
-        if (mSelected == null)
+        //Append to back if no selected marker, or if selected marker is last marker.
+        if (mSelected == null || mSelected.equals(mMarkers.get(mMarkers.size() - 1)))
             mMarkers.add(marker);
-        else if (mSelected.equals(mMarkers.get(mMarkers.size() - 1))) {
-            mSelected.setIcon(Icons.normal(mType));
-            mMarkers.add(marker);
-        } else {
-            mSelected.setIcon(Icons.normal(mType));
+        else
             mMarkers.add(mMarkers.indexOf(mSelected) + 1, marker);
-        }
 
         setSelected(marker);
     }
 
-    public void remove(@NonNull Marker marker) {
-        if (marker.equals(mSelected))
-            setSelected(previous(marker));
+    public void add(int id, LatLng latlng, GoogleMap map) {
+        add(latlng, map);
+        mSelected.setTag(new Tag(mType, id));
+    }
+
+    //Remove selected if non-null, otherwise remove back marker.
+    public void remove() {
+        if (!mMarkers.isEmpty()) {
+            if (mSelected == null )
+                setSelected(mMarkers.get(mMarkers.size() - 1));
+            remove(mSelected);
+        }
+    }
+
+    private void remove(@NonNull Marker marker) {
+        setSelected(previous(marker));
         mMarkers.remove(marker);
         marker.remove();
     }

@@ -6,12 +6,12 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Editor.Containers.Lines;
-import com.smiley98.robot_path_planner.Editor.Containers.Markers;
-import com.smiley98.robot_path_planner.Editor.Common.Icons;
-import com.smiley98.robot_path_planner.Editor.Common.State;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
-import com.smiley98.robot_path_planner.Editor.IPoint;
+import com.smiley98.robot_path_planner.Editor.Containers.Polygon;
+import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Obstacles implements IPoint {
     public Obstacles(AppCompatButton button) {
@@ -22,29 +22,31 @@ public class Obstacles implements IPoint {
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
         if (mState == State.ADD) {
-            mMarkers.add(latLng, map);
-            mLines.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
+            if (mSelectedPolygon == null)
+                mSelectedPolygon = new Polygon(Type.OBSTACLE);
+
+            mSelectedPolygon.add(latLng, map, mButton.getContext());
+
+            if (!mPolygons.containsKey(mSelectedPolygon.id()))
+                mPolygons.put(mSelectedPolygon.id(), mSelectedPolygon);
         }
     }
 
     @Override
     public void onMarkerClick(@NonNull Marker marker) {
         setState(State.REMOVE);
-        if (mMarkers.selected() != null)
-            mMarkers.selected().setIcon(Icons.normal(Type.OBSTACLE));
-        mMarkers.setSelected(marker);
+        Polygon.find(marker).setSelected(marker);
     }
 
     @Override
     public void onButtonClick() {
-        if (mState == State.REMOVE && mMarkers.size() > 0) {
-            if (mMarkers.selected() == null)
-                mMarkers.setSelected(mMarkers.get(mMarkers.size() - 1));
-            mMarkers.remove(mMarkers.selected());
-            mLines.onMarkerRemoved(mMarkers.points());
+        if (mState == State.REMOVE && mSelectedPolygon != null) {
+            mSelectedPolygon.remove();
 
-            if (mMarkers.size() == 0)
-                setState(State.ADD);
+            if (mSelectedPolygon.size() == 0) {
+                mPolygons.remove(mSelectedPolygon.id());
+                mSelectedPolygon = null;
+            }
         }
     }
 
@@ -66,8 +68,13 @@ public class Obstacles implements IPoint {
         mState = state;
     }
 
-    private final Markers mMarkers = new Markers(Type.OBSTACLE);
-    private final Lines mLines = new Lines(Type.OBSTACLE);
     private final AppCompatButton mButton;
+    private final Map<Integer, Polygon> mPolygons = new HashMap<>();
+    private Polygon mSelectedPolygon = null;
     private State mState;
+
+    private enum State {
+        ADD,
+        REMOVE
+    }
 }

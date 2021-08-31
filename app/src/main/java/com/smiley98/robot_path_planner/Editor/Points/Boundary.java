@@ -6,10 +6,6 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Editor.Containers.Lines;
-import com.smiley98.robot_path_planner.Editor.Containers.Markers;
-import com.smiley98.robot_path_planner.Editor.Common.Icons;
-import com.smiley98.robot_path_planner.Editor.Common.State;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.Editor.Containers.Polygon;
 import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
@@ -22,31 +18,22 @@ public class Boundary implements IPoint {
 
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
-        if (mState == State.ADD) {
-            mMarkers.add(latLng, map);
-            mLines.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
-            mPolygon.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
-        }
+        if (mState == State.ADD)
+            mPolygon.add(latLng, map, mButton.getContext());
     }
 
     @Override
     public void onMarkerClick(@NonNull Marker marker) {
         setState(State.REMOVE);
-        if (mMarkers.selected() != null)
-            mMarkers.selected().setIcon(Icons.normal(Type.BOUNDARY));
-        mMarkers.setSelected(marker);
+        mPolygon.setSelected(marker);
     }
 
     @Override
     public void onButtonClick() {
-        if (mState == State.REMOVE && mMarkers.size() > 0) {
-            if (mMarkers.selected() == null)
-                mMarkers.setSelected(mMarkers.get(mMarkers.size() - 1));
-            mMarkers.remove(mMarkers.selected());
-            mLines.onMarkerRemoved(mMarkers.points());
-            mPolygon.onMarkerRemoved(mMarkers.points());
+        if (mState == State.REMOVE) {
+            mPolygon.remove();
 
-            if (mMarkers.size() == 0)
+            if (mPolygon.size() == 0)
                 setState(State.ADD);
         }
     }
@@ -69,9 +56,12 @@ public class Boundary implements IPoint {
         mState = state;
     }
 
-    private final Markers mMarkers = new Markers(Type.BOUNDARY);
-    private final Lines mLines = new Lines(Type.BOUNDARY);
     private final Polygon mPolygon = new Polygon(Type.BOUNDARY);
     private final AppCompatButton mButton;
     private State mState;
+
+    private enum State {
+        ADD,
+        REMOVE
+    }
 }

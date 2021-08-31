@@ -23,6 +23,8 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.Objects;
+
 public class MapsActivity extends FragmentActivity implements
     View.OnClickListener, View.OnLongClickListener,
     OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
@@ -48,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements
         }
 
         mEditor = new Editor(pointButtons);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("fragment_maps");
+        SupportMapFragment mapFragment = (SupportMapFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag("fragment_maps"));
         mapFragment.getMapAsync(this);
     }
 

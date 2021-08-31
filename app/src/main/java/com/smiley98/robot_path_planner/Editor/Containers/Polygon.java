@@ -21,18 +21,15 @@ public class Polygon {
 
     public Polygon(Type type) {
         mMarkers  = new Markers(type);
+        mId = ++sId;
     }
 
     public void add(@NonNull LatLng latLng, GoogleMap map, Context context) {
-        if (mPolygon == null) {
+        mMarkers.add(mId, latLng, map);
+        if (mPolygon == null)
             mPolygon = map.addPolygon(options(context).add(latLng));
-            mId = ++sId;
-            sPolygons.put(mId, this);
-            mMarkers.add(mId, latLng, map);
-        } else {
-            mMarkers.add(mId, latLng, map);
+        else
             mPolygon.setPoints(mMarkers.points());
-        }
     }
 
     public void remove() {
@@ -42,7 +39,6 @@ public class Polygon {
         if (!points.isEmpty())
             mPolygon.setPoints(points);
         else {
-            sPolygons.remove(mId);
             mPolygon.remove();
             mPolygon = null;
         }
@@ -55,14 +51,11 @@ public class Polygon {
     public int id() { return mId; }
     public int size() { return mMarkers.size(); }
 
-    public static Polygon find(@NonNull Marker marker) { return sPolygons.get(((Tag) Objects.requireNonNull(marker.getTag())).id()); }
-
-    private final Markers mMarkers;
     private com.google.android.gms.maps.model.Polygon mPolygon;
-    private int mId;
+    private final Markers mMarkers;
+    private final int mId;
 
     private static int sId = 0;
-    private static final Map<Integer, Polygon> sPolygons = new HashMap<>();
 
     private PolygonOptions options(Context context) {
         PolygonOptions result = new PolygonOptions();

@@ -16,11 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.Marker;
 import com.smiley98.robot_path_planner.Events.Bus;
-import com.smiley98.robot_path_planner.Events.Messages.TestEvent;
+import com.smiley98.robot_path_planner.Events.GenericEvent;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,6 +31,7 @@ import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +45,7 @@ public class MapsActivity extends FragmentActivity implements
     private Editor mEditor;
     private RecyclerView mPathNamesView;
     private AppCompatTextView mTxtCurrentPath;
+    private String mCurrentPath = "";
 
     private AppCompatTextView mTxtEnterPath;
     private AppCompatEditText mEdtEnterPath;
@@ -99,7 +100,6 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         Icons.init(this);
-        onTest(new TestEvent(123));
 
         //Shout-out to downtown Toronto :D
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6426, -79.3846), 18.0f));
@@ -127,11 +127,21 @@ public class MapsActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSave:
-                mEditor.save("test.bin", mMap);
+                if (mCurrentPath.isEmpty()) {
+                    show(mPathNamesView, true);
+                    show(pathViews(), true);
+                } else {
+                    show(mPathNamesView, false);
+                    show(pathViews(), false);
+                    mEditor.save(mCurrentPath, mMap);
+                }
                 break;
 
             case R.id.btnLoad:
-                mEditor.load("test.bin", mMap);
+                if (mCurrentPath.isEmpty())
+                    mPathNamesView.setVisibility(View.VISIBLE);
+                else
+                    mEditor.load(mCurrentPath, mMap);
                 break;
 
             case R.id.btnWay:
@@ -167,9 +177,14 @@ public class MapsActivity extends FragmentActivity implements
         return false;
     }
 
-    @Subscribe
-    public void onTest(TestEvent event) {
-        Toast.makeText(this, "Testing " + event.data(), Toast.LENGTH_SHORT).show();
+    //Kind of unnecessary but things were getting too verbose for me.
+    private void show(View view, boolean show) {
+        view.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private void show(List<View> views, boolean show) {
+        for (View view : views)
+            show(view, show);
     }
 
     private ArrayList<View> pathViews() {
@@ -186,7 +201,6 @@ public class MapsActivity extends FragmentActivity implements
 
     public class PathNameView extends RecyclerView.Adapter<PathNameView.ViewHolder> {
         private final List<String> mPathNames;
-        //private ItemClickListener mClickListener;
 
         PathNameView(List<String> pathNames) {
             mPathNames = pathNames;
@@ -219,22 +233,22 @@ public class MapsActivity extends FragmentActivity implements
 
                 @Override
                 public void onClick(View view) {
-                    //if (mClickListener != null)
-                    //    mClickListener.onItemClick(view, getAdapterPosition());
+                    Bus.post(new ItemClickEvent(mTextView.getText().toString()));
                 }
             }
+    }
 
-        //Probably going to replace this with EventBus.
-        /*String getItem(int id) {
-            return mPathNames.get(id);
+    //Installed EventBus for a single use because I have a personal vendetta against RecyclerView's implementation.
+    //(And also because this is a portfolio piece so I wanted to showcase good abstractions and generics for no actual reason.)
+    public static class ItemClickEvent extends GenericEvent<String> {
+        public ItemClickEvent(String data) {
+            super(data);
         }
+    }
 
-        void setClickListener(ItemClickListener itemClickListener) {
-            mClickListener = itemClickListener;
-        }
-
-        public interface ItemClickListener {
-            void onItemClick(View view, int position);
-        }*/
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onItemClick(ItemClickEvent event) {
+        mTxtCurrentPath.setText("Current Path: " + event.data());
+        mCurrentPath = event.data();
     }
 }

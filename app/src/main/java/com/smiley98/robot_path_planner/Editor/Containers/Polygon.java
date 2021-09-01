@@ -44,12 +44,20 @@ public class Polygon {
         }
     }
 
+    public void clear() {
+        if (mPolygon != null)
+            mPolygon.remove();
+        mPolygon = null;
+        mMarkers.clear();
+    }
+
     public void setSelected(@NonNull Marker marker) {
         mMarkers.setSelected(marker);
     }
 
     public int id() { return mId; }
     public int size() { return mMarkers.size(); }
+    public List<LatLng> points() { return mMarkers.points(); }
 
     private com.google.android.gms.maps.model.Polygon mPolygon;
     private final Markers mMarkers;

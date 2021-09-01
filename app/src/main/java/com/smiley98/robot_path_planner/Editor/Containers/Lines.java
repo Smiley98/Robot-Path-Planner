@@ -27,6 +27,12 @@ public class Lines {
         mLine.setPoints(points);
     }
 
+    public void clear() {
+        if (mLine != null)
+            mLine.remove();
+        mLine = null;
+    }
+
     private PolylineOptions options(Context context) {
         PolylineOptions result = new PolylineOptions();
         switch (mType) {

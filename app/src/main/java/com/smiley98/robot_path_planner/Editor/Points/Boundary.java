@@ -6,9 +6,12 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.smiley98.robot_path_planner.Editor.Common.SerialPoint;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.Editor.Containers.Polygon;
 import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
+
+import java.util.ArrayList;
 
 public class Boundary implements IPoint {
     public Boundary(AppCompatButton button) {
@@ -19,7 +22,7 @@ public class Boundary implements IPoint {
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
         if (mState == State.ADD)
-            mPolygon.add(latLng, map, mButton.getContext());
+            add(latLng, map);
     }
 
     @Override
@@ -43,6 +46,19 @@ public class Boundary implements IPoint {
         setState(State.ADD);
     }
 
+    public void load(ArrayList<SerialPoint> points, GoogleMap map) {
+        mPolygon.clear();
+        for (SerialPoint point : points)
+            add(point.latLng(), map);
+    }
+
+    public ArrayList<SerialPoint> points() {
+        ArrayList<SerialPoint> result = new ArrayList<>();
+        for (LatLng latLng : mPolygon.points())
+            result.add(new SerialPoint(latLng));
+        return result;
+    }
+
     private void setState(State state) {
         switch (state) {
             case ADD:
@@ -54,6 +70,10 @@ public class Boundary implements IPoint {
                 break;
         }
         mState = state;
+    }
+
+    private void add(@NonNull LatLng latLng, GoogleMap map) {
+        mPolygon.add(latLng, map, mButton.getContext());
     }
 
     private final Polygon mPolygon = new Polygon(Type.BOUNDARY);

@@ -6,7 +6,10 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.Marker;
 import com.smiley98.robot_path_planner.Events.Bus;
@@ -23,6 +26,7 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
 import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements
@@ -40,6 +44,18 @@ public class MapsActivity extends FragmentActivity implements
         ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        binding.btnSave.setOnClickListener(this);
+        binding.btnLoad.setOnClickListener(this);
+        FileUtils.init(this, binding.btnSave, binding.btnLoad);
+
+        /*
+        //Create the storage directory if it does not exist
+        File folder = new File(Environment.getExternalStorageDirectory() + "/SampleFolder");
+        if (!folder.exists()) {
+            if (!folder.mkdirs())
+                Log.i(TAG, "failed to create directory");
+        }//*/
+
         AppCompatButton[] pointButtons = new AppCompatButton[Type.values().length];
         pointButtons[Type.WAY.ordinal()] = binding.btnWay;
         pointButtons[Type.BOUNDARY.ordinal()] = binding.btnBoundary;
@@ -49,7 +65,8 @@ public class MapsActivity extends FragmentActivity implements
             pointButtons[i].setOnLongClickListener(this);
         }
 
-        mEditor = new Editor(pointButtons);
+        //Accessing buttons as array reduces legibility in Editor. Only made array to shorten listener setters.
+        mEditor = new Editor(binding.btnWay, binding.btnBoundary, binding.btnObstacle);
         SupportMapFragment mapFragment = (SupportMapFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag("fragment_maps"));
         mapFragment.getMapAsync(this);
     }
@@ -65,6 +82,7 @@ public class MapsActivity extends FragmentActivity implements
         Icons.init(this);
         onTest(new TestEvent(123));
 
+        //Shout-out to downtown Toronto :D
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6426, -79.3846), 18.0f));
         map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
@@ -89,6 +107,14 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnSave:
+                mEditor.save("test.bin", mMap);
+                break;
+
+            case R.id.btnLoad:
+                mEditor.load("test.bin", mMap);
+                break;
+
             case R.id.btnWay:
                 mEditor.onPointButtonClick(Type.WAY);
                 break;
@@ -124,6 +150,6 @@ public class MapsActivity extends FragmentActivity implements
 
     @Subscribe
     public void onTest(TestEvent event) {
-        Util.toastShort(this, "Testing " + event.data());
+        Toast.makeText(this, "Testing " + event.data(), Toast.LENGTH_SHORT).show();
     }
 }

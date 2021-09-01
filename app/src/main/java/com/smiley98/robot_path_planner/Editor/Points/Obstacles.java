@@ -6,11 +6,13 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.smiley98.robot_path_planner.Editor.Common.SerialPoint;
 import com.smiley98.robot_path_planner.Editor.Common.Tag;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.Editor.Containers.Polygon;
 import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,14 +25,7 @@ public class Obstacles implements IPoint {
 
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
-        if (mState == State.NEW) {
-            mSelectedPolygon = new Polygon(Type.OBSTACLE);
-            mPolygons.put(mSelectedPolygon.id(), mSelectedPolygon);
-            setState(State.EDIT);
-        }
-
-        if (mState == State.EDIT)
-            mSelectedPolygon.add(latLng, map, mButton.getContext());
+        add(latLng, map);
     }
 
     @Override
@@ -62,6 +57,28 @@ public class Obstacles implements IPoint {
             setState(State.NEW);
     }
 
+    public void load(ArrayList<ArrayList<SerialPoint>> polygons, GoogleMap map) {
+        for (Polygon geometry : mPolygons.values())
+            geometry.clear();
+
+        for (ArrayList<SerialPoint> polygon : polygons) {
+            for (SerialPoint point : polygon)
+                add(point.latLng(), map);
+            setState(State.NEW);
+        }
+    }
+
+    public ArrayList<ArrayList<SerialPoint>> points() {
+        ArrayList<ArrayList<SerialPoint>> result = new ArrayList<>();
+        for (Polygon polygon : mPolygons.values()) {
+            ArrayList<SerialPoint> polygonPoints = new ArrayList<>();
+            for (LatLng latLng : polygon.points())
+                polygonPoints.add(new SerialPoint(latLng));
+            result.add(polygonPoints);
+        }
+        return result;
+    }
+
     private void setState(State state) {
         switch (state) {
             case NEW:
@@ -78,6 +95,17 @@ public class Obstacles implements IPoint {
                 break;
         }
         mState = state;
+    }
+
+    private void add(@NonNull LatLng latLng, GoogleMap map) {
+        if (mState == State.NEW) {
+            mSelectedPolygon = new Polygon(Type.OBSTACLE);
+            mPolygons.put(mSelectedPolygon.id(), mSelectedPolygon);
+            setState(State.EDIT);
+        }
+
+        if (mState == State.EDIT)
+            mSelectedPolygon.add(latLng, map, mButton.getContext());
     }
 
     private final AppCompatButton mButton;

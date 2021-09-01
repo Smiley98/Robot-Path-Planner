@@ -61,6 +61,12 @@ public class Markers {
         }
     }
 
+    public void clear() {
+        for (Marker marker : mMarkers)
+            marker.remove();
+        mMarkers.clear();
+    }
+
     private void remove(@NonNull Marker marker) {
         setSelected(previous(marker));
         mMarkers.remove(marker);
@@ -83,5 +89,4 @@ public class Markers {
     private final ArrayList<Marker> mMarkers = new ArrayList<>();
     private Marker mSelected = null;
     private final Type mType;
-    private static final String TAG = Markers.class.getSimpleName();
 }

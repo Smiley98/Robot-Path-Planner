@@ -12,7 +12,7 @@ public class App extends Application {
         Bus.init();
     }
 
-    public void exit() {
+    public static void exit() {
         Bus.exit();
         System.exit(0);
     }

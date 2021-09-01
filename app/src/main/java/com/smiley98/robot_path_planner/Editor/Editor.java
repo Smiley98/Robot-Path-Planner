@@ -12,41 +12,72 @@ import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
 import com.smiley98.robot_path_planner.Editor.Points.Boundary;
 import com.smiley98.robot_path_planner.Editor.Points.Obstacles;
 import com.smiley98.robot_path_planner.Editor.Points.Way;
+import com.smiley98.robot_path_planner.FileUtils;
 
+import java.io.File;
 import java.util.Objects;
 
 public class Editor {
 
-    public Editor(AppCompatButton[] pointButtons) {
-        mPoints[Type.WAY.ordinal()] = new Way(pointButtons[Type.WAY.ordinal()]);
-        mPoints[Type.BOUNDARY.ordinal()] = new Boundary(pointButtons[Type.BOUNDARY.ordinal()]);
-        mPoints[Type.OBSTACLE.ordinal()] = new Obstacles(pointButtons[Type.OBSTACLE.ordinal()]);
+    public Editor(AppCompatButton wayButton, AppCompatButton boundaryButton, AppCompatButton obstaclesButton) {
+        mWay = new Way(wayButton);
+        mBoundary = new Boundary(boundaryButton);
+        mObstacles = new Obstacles(obstaclesButton);
+    }
+
+    public void save(String name, GoogleMap map) {
+        FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
+        map.clear();
+    }
+
+    public void load(String name, GoogleMap map) {
+        EditorFile serial = FileUtils.deserialize(FileUtils.create(name));
+        mWay.load(serial.wayPoints(), map);
+        mBoundary.load(serial.boundaryPoints(), map);
+        mObstacles.load(serial.obstacles(), map);
     }
 
     //Add
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
-        mPoints[mType.ordinal()].onMapClick(latLng, map);
+        point(mType).onMapClick(latLng, map);
     }
 
     //Set
     public void onMarkerClick(@NonNull Marker marker) {
         Type type = ((Tag) Objects.requireNonNull(marker.getTag())).type();
-        mPoints[type.ordinal()].onMarkerClick(marker);
+        point(type).onMarkerClick(marker);
         mType = type;
     }
 
     //Remove
     public void onPointButtonClick(Type type) {
-        mPoints[type.ordinal()].onButtonClick();
+        point(type).onButtonClick();
         mType = type;
     }
 
     //Reset
     public void onPointButtonLongClick(Type type) {
-        mPoints[type.ordinal()].onButtonLongClick();
+        point(type).onButtonLongClick();
         mType = type;
     }
 
-    private final IPoint[] mPoints = new IPoint[Type.values().length];
+    @NonNull
+    private IPoint point(Type type) {
+        switch (type) {
+            case WAY:
+                return mWay;
+
+            case BOUNDARY:
+                return mBoundary;
+
+            case OBSTACLE:
+                return mObstacles;
+        }
+        return null;
+    }
+
+    private final Way mWay;
+    private final Boundary mBoundary;
+    private final Obstacles mObstacles;
     private Type mType = Type.WAY;
 }

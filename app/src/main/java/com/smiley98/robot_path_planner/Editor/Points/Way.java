@@ -6,10 +6,13 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.smiley98.robot_path_planner.Editor.Common.SerialPoint;
 import com.smiley98.robot_path_planner.Editor.Containers.Lines;
 import com.smiley98.robot_path_planner.Editor.Containers.Markers;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
+
+import java.util.ArrayList;
 
 public class Way implements IPoint {
     public Way(AppCompatButton button) {
@@ -19,10 +22,8 @@ public class Way implements IPoint {
 
     @Override
     public void onMapClick(@NonNull LatLng latLng, GoogleMap map) {
-        if (mState == State.ADD) {
-            mMarkers.add(latLng, map);
-            mLines.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
-        }
+        if (mState == State.ADD)
+            add(latLng, map);
     }
 
     @Override
@@ -47,6 +48,20 @@ public class Way implements IPoint {
         setState(State.ADD);
     }
 
+    public void load(ArrayList<SerialPoint> points, GoogleMap map) {
+        mMarkers.clear();
+        mLines.clear();
+        for (SerialPoint point : points)
+            add(point.latLng(), map);
+    }
+
+    public ArrayList<SerialPoint> points() {
+        ArrayList<SerialPoint> result = new ArrayList<>();
+        for (LatLng latLng : mMarkers.points())
+            result.add(new SerialPoint(latLng));
+        return result;
+    }
+
     private void setState(State state) {
         switch (state) {
             case ADD:
@@ -58,6 +73,11 @@ public class Way implements IPoint {
                 break;
         }
         mState = state;
+    }
+
+    private void add(@NonNull LatLng latLng, GoogleMap map) {
+        mMarkers.add(latLng, map);
+        mLines.onMarkerAdded(mMarkers.points(), map, mButton.getContext());
     }
 
     private final Markers mMarkers = new Markers(Type.WAY);

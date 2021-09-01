@@ -10,7 +10,7 @@
         <entry key="app/src/main/res/drawable/marker_obstacle_selected.xml" value="0.3859375" />
         <entry key="app/src/main/res/drawable/marker_way.xml" value="0.2375" />
         <entry key="app/src/main/res/drawable/marker_way_selected.xml" value="0.3859375" />
-        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.67" />
+        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.5" />
         <entry key="app/src/main/res/layout/fragment_maps.xml" value="0.2078125" />
         <entry key="app/src/main/res/layout/layout_editor.xml" value="0.266304347826087" />
       </map>

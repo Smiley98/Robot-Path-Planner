@@ -1,6 +1,7 @@
 package com.smiley98.robot_path_planner.Editor;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -25,8 +26,11 @@ public class Editor {
     }
 
     public void save(String name, GoogleMap map) {
-        FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
-        map.clear();
+        if (!mWay.points().isEmpty()) {
+            FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
+            map.clear();
+        } else
+            new AlertDialog.Builder(mWay.context()).setTitle("Error").setMessage("Cannot save path without way points.").setPositiveButton("Ok", null).show();
     }
 
     public void load(String name, GoogleMap map) {
@@ -60,19 +64,8 @@ public class Editor {
         mType = type;
     }
 
-    @NonNull
     private IPoint point(Type type) {
-        switch (type) {
-            case WAY:
-                return mWay;
-
-            case BOUNDARY:
-                return mBoundary;
-
-            case OBSTACLE:
-                return mObstacles;
-        }
-        return null;
+        return new IPoint[] { mWay, mBoundary, mObstacles }[type.ordinal()];
     }
 
     private final Way mWay;

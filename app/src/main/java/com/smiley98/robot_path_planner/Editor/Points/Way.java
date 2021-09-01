@@ -1,5 +1,7 @@
 package com.smiley98.robot_path_planner.Editor.Points;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 
@@ -61,6 +63,8 @@ public class Way implements IPoint {
             result.add(new SerialPoint(latLng));
         return result;
     }
+
+    public Context context() { return mButton.getContext(); }
 
     private void setState(State state) {
         switch (state) {

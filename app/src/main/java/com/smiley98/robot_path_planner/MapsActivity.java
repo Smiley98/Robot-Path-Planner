@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.Marker;
 import com.smiley98.robot_path_planner.Events.Bus;
@@ -73,6 +75,7 @@ public class MapsActivity extends FragmentActivity implements
         mTxtEnterPath = binding.txtEnterPath;
         mEdtEnterPath = binding.edtEnterPath;
         mBtnPathOk = binding.btnPathOk;
+        mBtnPathOk.setOnClickListener(this);
         for (View view : pathViews())
             view.setVisibility(View.INVISIBLE);
 
@@ -126,22 +129,43 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnPathOk:
+                String[] pathNames = FileUtils.root().list();
+                String pathText = mEdtEnterPath.getText().toString();
+                if (pathNames != null) {
+                    for (String path : pathNames) {
+                        if (path.equals(pathText)) {
+                            mEdtEnterPath.setError("Path " + path + " already exists");
+                            return;
+                        }
+                    }
+                }
+                show(pathViews(), false);
+                mCurrentPath = pathText + ".path";
+                FileUtils.create(mCurrentPath);
+                updatePathNames(FileUtils.root().list());
+                Toast.makeText(this, "Created " + mCurrentPath, Toast.LENGTH_SHORT).show();
+                break;
+
             case R.id.btnSave:
                 if (mCurrentPath.isEmpty()) {
                     show(mPathNamesView, true);
                     show(pathViews(), true);
+                    new AlertDialog.Builder(this)
+                        .setTitle("Warning")
+                        .setMessage("No current path. Please enter a path name.")
+                        .setPositiveButton("Ok", null)
+                        .show();
                 } else {
                     show(mPathNamesView, false);
                     show(pathViews(), false);
                     mEditor.save(mCurrentPath, mMap);
+                    Toast.makeText(this, "Path " + mCurrentPath + " saved.", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
             case R.id.btnLoad:
-                if (mCurrentPath.isEmpty())
-                    mPathNamesView.setVisibility(View.VISIBLE);
-                else
-                    mEditor.load(mCurrentPath, mMap);
+                show(mPathNamesView, true);
                 break;
 
             case R.id.btnWay:
@@ -177,9 +201,12 @@ public class MapsActivity extends FragmentActivity implements
         return false;
     }
 
-    //Kind of unnecessary but things were getting too verbose for me.
-    private void show(View view, boolean show) {
-        view.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    private ArrayList<View> pathViews() {
+        ArrayList<View> views = new ArrayList<>();
+        views.add(mTxtEnterPath);
+        views.add(mEdtEnterPath);
+        views.add(mBtnPathOk);
+        return views;
     }
 
     private void show(List<View> views, boolean show) {
@@ -187,12 +214,8 @@ public class MapsActivity extends FragmentActivity implements
             show(view, show);
     }
 
-    private ArrayList<View> pathViews() {
-        ArrayList<View> views = new ArrayList<>();
-        views.add(mTxtEnterPath);
-        views.add(mEdtEnterPath);
-        views.add(mBtnPathOk);
-        return views;
+    private void show(View view, boolean show) {
+        view.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void updatePathNames(@Nullable String[] pathNames) {
@@ -250,5 +273,6 @@ public class MapsActivity extends FragmentActivity implements
     public void onItemClick(ItemClickEvent event) {
         mTxtCurrentPath.setText("Current Path: " + event.data());
         mCurrentPath = event.data();
+        mEditor.load(event.data(), mMap);
     }
 }

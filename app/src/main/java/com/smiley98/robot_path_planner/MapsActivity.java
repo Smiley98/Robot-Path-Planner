@@ -1,6 +1,7 @@
 package com.smiley98.robot_path_planner;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -31,6 +32,7 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,6 +41,7 @@ public class MapsActivity extends FragmentActivity implements
     OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     private Editor mEditor;
+    private RecyclerView mPathNamesView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +55,10 @@ public class MapsActivity extends FragmentActivity implements
         binding.btnLoad.setOnClickListener(this);
         FileUtils.init(this, binding.btnSave, binding.btnLoad);
 
-        ArrayList<String> pathNames = new ArrayList<>();
-        pathNames.add("a");
-        pathNames.add("b");
-        pathNames.add("c");
-        pathNames.add("d");
-        pathNames.add("e");
-        RecyclerView pnv = binding.rcvPaths;
-        pnv.setLayoutManager(new LinearLayoutManager(this));
-        pnv.setAdapter(new PathNameView(pathNames));
-        pnv.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        //FileUtils.root().listFiles();
+        mPathNamesView = binding.rcvPaths;
+        mPathNamesView.setLayoutManager(new LinearLayoutManager(this));
+        mPathNamesView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        updatePathNames(FileUtils.root().list());
 
         AppCompatButton[] pointButtons = new AppCompatButton[Type.values().length];
         pointButtons[Type.WAY.ordinal()] = binding.btnWay;
@@ -161,9 +157,13 @@ public class MapsActivity extends FragmentActivity implements
         Toast.makeText(this, "Testing " + event.data(), Toast.LENGTH_SHORT).show();
     }
 
-    public static class PathNameView extends RecyclerView.Adapter<PathNameView.ViewHolder> {
+    private void updatePathNames(@Nullable String[] pathNames) {
+        mPathNamesView.setAdapter(new PathNameView(pathNames != null ? Arrays.asList(pathNames) : new ArrayList<>()));
+    }
+
+    public class PathNameView extends RecyclerView.Adapter<PathNameView.ViewHolder> {
         private final List<String> mPathNames;
-        private ItemClickListener mClickListener;
+        //private ItemClickListener mClickListener;
 
         PathNameView(List<String> pathNames) {
             mPathNames = pathNames;

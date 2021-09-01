@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Environment;
 import android.provider.Settings;
-import android.util.Log;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -103,11 +102,3 @@ public class FileUtils {
         return data;
     }
 }
-
-/*public static void toastShort(Context context, String message) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-}
-
-public static void toastLong(Context context, String message) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-}*/

@@ -6,8 +6,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,13 +24,11 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.File;
 import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements
     View.OnClickListener, View.OnLongClickListener,
     OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
-    private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private Editor mEditor;
 
@@ -47,14 +43,6 @@ public class MapsActivity extends FragmentActivity implements
         binding.btnSave.setOnClickListener(this);
         binding.btnLoad.setOnClickListener(this);
         FileUtils.init(this, binding.btnSave, binding.btnLoad);
-
-        /*
-        //Create the storage directory if it does not exist
-        File folder = new File(Environment.getExternalStorageDirectory() + "/SampleFolder");
-        if (!folder.exists()) {
-            if (!folder.mkdirs())
-                Log.i(TAG, "failed to create directory");
-        }//*/
 
         AppCompatButton[] pointButtons = new AppCompatButton[Type.values().length];
         pointButtons[Type.WAY.ordinal()] = binding.btnWay;

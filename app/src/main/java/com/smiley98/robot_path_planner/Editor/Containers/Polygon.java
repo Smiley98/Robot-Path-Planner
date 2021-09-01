@@ -8,14 +8,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.smiley98.robot_path_planner.Editor.Common.Tag;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.R;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class Polygon {
 

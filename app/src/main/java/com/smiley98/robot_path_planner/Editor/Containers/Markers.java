@@ -87,7 +87,7 @@ public class Markers {
         return index == 0 ? mMarkers.get(mMarkers.size() - 1) : mMarkers.get(index - 1);
     }
 
+    private final Type mType;
     private final ArrayList<Marker> mMarkers = new ArrayList<>();
     private Marker mSelected = null;
-    private final Type mType;
 }

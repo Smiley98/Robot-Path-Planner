@@ -3,6 +3,8 @@ package com.smiley98.robot_path_planner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,6 +44,11 @@ public class MapsActivity extends FragmentActivity implements
     private GoogleMap mMap;
     private Editor mEditor;
     private RecyclerView mPathNamesView;
+    private AppCompatTextView mTxtCurrentPath;
+
+    private AppCompatTextView mTxtEnterPath;
+    private AppCompatEditText mEdtEnterPath;
+    private AppCompatButton mBtnPathOk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,18 +62,26 @@ public class MapsActivity extends FragmentActivity implements
         binding.btnLoad.setOnClickListener(this);
         FileUtils.init(this, binding.btnSave, binding.btnLoad);
 
+        mTxtCurrentPath = binding.txtCurrentPath;
         mPathNamesView = binding.rcvPaths;
+        mPathNamesView.setVisibility(View.INVISIBLE);
         mPathNamesView.setLayoutManager(new LinearLayoutManager(this));
         mPathNamesView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         updatePathNames(FileUtils.root().list());
 
-        AppCompatButton[] pointButtons = new AppCompatButton[Type.values().length];
-        pointButtons[Type.WAY.ordinal()] = binding.btnWay;
-        pointButtons[Type.BOUNDARY.ordinal()] = binding.btnBoundary;
-        pointButtons[Type.OBSTACLE.ordinal()] = binding.btnObstacle;
-        for (int i = 0; i < Type.values().length; i++) {
-            pointButtons[i].setOnClickListener(this);
-            pointButtons[i].setOnLongClickListener(this);
+        mTxtEnterPath = binding.txtEnterPath;
+        mEdtEnterPath = binding.edtEnterPath;
+        mBtnPathOk = binding.btnPathOk;
+        for (View view : pathViews())
+            view.setVisibility(View.INVISIBLE);
+
+        ArrayList<AppCompatButton> pointButtons = new ArrayList<>();
+        pointButtons.add(binding.btnWay);
+        pointButtons.add(binding.btnBoundary);
+        pointButtons.add(binding.btnObstacle);
+        for (View view : pointButtons) {
+            view.setOnClickListener(this);
+            view.setOnLongClickListener(this);
         }
 
         //Accessing buttons as array reduces legibility in Editor. Only made array to shorten listener setters.
@@ -155,6 +170,14 @@ public class MapsActivity extends FragmentActivity implements
     @Subscribe
     public void onTest(TestEvent event) {
         Toast.makeText(this, "Testing " + event.data(), Toast.LENGTH_SHORT).show();
+    }
+
+    private ArrayList<View> pathViews() {
+        ArrayList<View> views = new ArrayList<>();
+        views.add(mTxtEnterPath);
+        views.add(mEdtEnterPath);
+        views.add(mBtnPathOk);
+        return views;
     }
 
     private void updatePathNames(@Nullable String[] pathNames) {

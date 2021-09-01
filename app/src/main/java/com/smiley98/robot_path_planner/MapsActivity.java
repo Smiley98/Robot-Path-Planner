@@ -3,10 +3,16 @@ package com.smiley98.robot_path_planner;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.Marker;
@@ -24,6 +30,8 @@ import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements
@@ -43,6 +51,18 @@ public class MapsActivity extends FragmentActivity implements
         binding.btnSave.setOnClickListener(this);
         binding.btnLoad.setOnClickListener(this);
         FileUtils.init(this, binding.btnSave, binding.btnLoad);
+
+        ArrayList<String> pathNames = new ArrayList<>();
+        pathNames.add("a");
+        pathNames.add("b");
+        pathNames.add("c");
+        pathNames.add("d");
+        pathNames.add("e");
+        RecyclerView pnv = binding.rcvPaths;
+        pnv.setLayoutManager(new LinearLayoutManager(this));
+        pnv.setAdapter(new PathNameView(pathNames));
+        pnv.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        //FileUtils.root().listFiles();
 
         AppCompatButton[] pointButtons = new AppCompatButton[Type.values().length];
         pointButtons[Type.WAY.ordinal()] = binding.btnWay;
@@ -139,5 +159,59 @@ public class MapsActivity extends FragmentActivity implements
     @Subscribe
     public void onTest(TestEvent event) {
         Toast.makeText(this, "Testing " + event.data(), Toast.LENGTH_SHORT).show();
+    }
+
+    public static class PathNameView extends RecyclerView.Adapter<PathNameView.ViewHolder> {
+        private final List<String> mPathNames;
+        private ItemClickListener mClickListener;
+
+        PathNameView(List<String> pathNames) {
+            mPathNames = pathNames;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.path_name_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.mTextView.setText(mPathNames.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return mPathNames.size();
+        }
+
+            public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+                TextView mTextView;
+
+                ViewHolder(View itemView) {
+                    super(itemView);
+                    mTextView = itemView.findViewById(R.id.txtPathName);
+                    itemView.setOnClickListener(this);
+                }
+
+                @Override
+                public void onClick(View view) {
+                    //if (mClickListener != null)
+                    //    mClickListener.onItemClick(view, getAdapterPosition());
+                }
+            }
+
+        //Probably going to replace this with EventBus.
+        /*String getItem(int id) {
+            return mPathNames.get(id);
+        }
+
+        void setClickListener(ItemClickListener itemClickListener) {
+            mClickListener = itemClickListener;
+        }
+
+        public interface ItemClickListener {
+            void onItemClick(View view, int position);
+        }*/
     }
 }

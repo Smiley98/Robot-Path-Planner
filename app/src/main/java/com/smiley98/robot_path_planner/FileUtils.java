@@ -22,6 +22,8 @@ public class FileUtils {
             sApplicationDirectory.mkdirs();
     }
 
+    public static File root() { return sApplicationDirectory; }
+
     //Must ask permission to use external storage in Android 11.
     public static void init(MapsActivity activity, AppCompatButton saveButton, AppCompatButton loadButton) {
         ActivityResultLauncher<Intent> storagePermissionResultLauncher =

@@ -13,15 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.Marker;
 import com.smiley98.robot_path_planner.Events.Bus;
-import com.smiley98.robot_path_planner.Events.GenericEvent;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -235,6 +231,20 @@ public class MapsActivity extends FragmentActivity implements
         return false;
     }
 
+    @Subscribe
+    public void onItemClick(PathNameView.ItemClickEvent event) {
+        Toast.makeText(this, (mDeletePath ? "Deleted " : "Loaded ") + event.data(), Toast.LENGTH_SHORT).show();
+        if (mDeletePath) {
+            if (event.data().equals(mCurrentPath))
+                setCurrentPath("");
+            deletePath(event.data());
+        } else {
+            setCurrentPath(event.data());
+            if (!mEditor.load(mCurrentPath, mMap))
+                onPathError(PathOperation.LOAD, mCurrentPath);
+        }
+    }
+
     private ArrayList<View> pathViews() {
         ArrayList<View> views = new ArrayList<>();
         views.add(mTxtEnterPath);
@@ -259,67 +269,6 @@ public class MapsActivity extends FragmentActivity implements
     private void setCurrentPath(String path) {
         mCurrentPath = path;
         mTxtCurrentPath.setText("Current Path: " + mCurrentPath);
-    }
-
-    public class PathNameView extends RecyclerView.Adapter<PathNameView.ViewHolder> {
-        private final List<String> mPathNames;
-
-        PathNameView(List<String> pathNames) {
-            mPathNames = pathNames;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.path_name_item, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.mTextView.setText(mPathNames.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return mPathNames.size();
-        }
-
-            public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-                TextView mTextView;
-
-                ViewHolder(View itemView) {
-                    super(itemView);
-                    mTextView = itemView.findViewById(R.id.txtPathName);
-                    itemView.setOnClickListener(this);
-                }
-
-                @Override
-                public void onClick(View view) {
-                    Bus.post(new ItemClickEvent(mTextView.getText().toString()));
-                }
-            }
-    }
-
-    //Installed EventBus for a single use because I have a personal vendetta against RecyclerView's implementation.
-    //(And also because this is a portfolio piece so I wanted to showcase abstractions and generics for no actual reason.)
-    public static class ItemClickEvent extends GenericEvent<String> {
-        public ItemClickEvent(String data) {
-            super(data);
-        }
-    }
-
-    @Subscribe
-    public void onItemClick(ItemClickEvent event) {
-        Toast.makeText(this, (mDeletePath ? "Deleted " : "Loaded ") + event.data(), Toast.LENGTH_SHORT).show();
-        if (mDeletePath) {
-            if (event.data().equals(mCurrentPath))
-                setCurrentPath("");
-            deletePath(event.data());
-        } else {
-            setCurrentPath(event.data());
-            if (!mEditor.load(mCurrentPath, mMap))
-                onPathError(PathOperation.LOAD, mCurrentPath);
-        }
     }
 
     private void onPathError(PathOperation operation, String path) {

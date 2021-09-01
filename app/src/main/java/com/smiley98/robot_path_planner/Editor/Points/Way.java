@@ -51,10 +51,14 @@ public class Way implements IPoint {
     }
 
     public void load(ArrayList<SerialPoint> points, GoogleMap map) {
-        mMarkers.clear();
-        mLines.clear();
+        clear();
         for (SerialPoint point : points)
             add(point.latLng(), map);
+    }
+
+    public void clear() {
+        mMarkers.clear();
+        mLines.clear();
     }
 
     public ArrayList<SerialPoint> points() {
@@ -63,8 +67,6 @@ public class Way implements IPoint {
             result.add(new SerialPoint(latLng));
         return result;
     }
-
-    public Context context() { return mButton.getContext(); }
 
     private void setState(State state) {
         switch (state) {

@@ -78,15 +78,17 @@ public class FileUtils {
         }
     }
 
-    public static <T extends Serializable> void serialize(File file, T data) {
+    public static <T extends Serializable> boolean serialize(File file, T data) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(data);
             objectOutputStream.close();
             fileOutputStream.close();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

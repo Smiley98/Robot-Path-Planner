@@ -33,7 +33,6 @@ import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.databinding.ActivityMapsBinding;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements
     private RecyclerView mPathNamesView;
     private AppCompatTextView mTxtCurrentPath;
     private String mCurrentPath = "";
+    private boolean mDeletePath = false;
 
     private AppCompatTextView mTxtEnterPath;
     private AppCompatEditText mEdtEnterPath;
@@ -64,6 +64,8 @@ public class MapsActivity extends FragmentActivity implements
         binding.btnSave.setOnClickListener(this);
         binding.btnLoad.setOnClickListener(this);
         FileUtils.init(this, binding.btnSave, binding.btnLoad);
+        binding.btnCreate.setOnClickListener(this);
+        binding.btnDelete.setOnClickListener(this);
 
         mTxtCurrentPath = binding.txtCurrentPath;
         mPathNamesView = binding.rcvPaths;
@@ -129,43 +131,75 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnCreate:
+                mDeletePath = false;
+                show(pathViews(), true);
+                show(mPathNamesView, false);
+                break;
+
+            case R.id.btnDelete:
+                mDeletePath = true;
+                show(pathViews(), false);
+                show(mPathNamesView, true);
+                break;
+
             case R.id.btnPathOk:
+                //Verify entered path isn't a duplicate.
                 String[] pathNames = FileUtils.root().list();
-                String pathText = mEdtEnterPath.getText().toString();
+                String pathText = mEdtEnterPath.getText().toString() + ".path";
                 if (pathNames != null) {
                     for (String path : pathNames) {
                         if (path.equals(pathText)) {
-                            mEdtEnterPath.setError("Path " + path + " already exists");
+                            mEdtEnterPath.setError(path + " already exists");
                             return;
                         }
                     }
                 }
-                show(pathViews(), false);
-                mCurrentPath = pathText + ".path";
-                FileUtils.create(mCurrentPath);
+
+                //Attempt to save previous path.
+                if (!mCurrentPath.isEmpty() && !mEditor.save(mCurrentPath))
+                    onPathError(PathOperation.SAVE, mCurrentPath);
+
+                //Create path, select it, and notify user.
+                setCurrentPath(pathText);
+                FileUtils.create(pathText);
                 updatePathNames(FileUtils.root().list());
-                Toast.makeText(this, "Created " + mCurrentPath, Toast.LENGTH_SHORT).show();
+                show(pathViews(), false);
+                Toast.makeText(this, "Created " + pathText, Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.btnSave:
                 if (mCurrentPath.isEmpty()) {
-                    show(mPathNamesView, true);
-                    show(pathViews(), true);
                     new AlertDialog.Builder(this)
                         .setTitle("Warning")
-                        .setMessage("No current path. Please enter a path name.")
+                        .setMessage("No path selected. Please create or load a path.")
                         .setPositiveButton("Ok", null)
                         .show();
                 } else {
-                    show(mPathNamesView, false);
-                    show(pathViews(), false);
-                    mEditor.save(mCurrentPath, mMap);
-                    Toast.makeText(this, "Path " + mCurrentPath + " saved.", Toast.LENGTH_SHORT).show();
+                    if (!mEditor.isEmpty()) {
+                        show(mPathNamesView, false);
+                        show(pathViews(), false);
+                        mEditor.save(mCurrentPath);
+                        Toast.makeText(this, "Saved " + mCurrentPath, Toast.LENGTH_SHORT).show();
+                    } else
+                        new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("Error")
+                            .setMessage("Cannot save path without way points.")
+                            .setPositiveButton("Ok", null)
+                            .show();
                 }
                 break;
 
             case R.id.btnLoad:
-                show(mPathNamesView, true);
+                pathNames = FileUtils.root().list();
+                if (pathNames != null && pathNames.length != 0)
+                    show(mPathNamesView, true);
+                else
+                    new AlertDialog.Builder(this)
+                        .setTitle("Warning")
+                        .setMessage("No paths exist. Please create a path.")
+                        .setPositiveButton("Ok", null)
+                        .show();
                 break;
 
             case R.id.btnWay:
@@ -222,6 +256,11 @@ public class MapsActivity extends FragmentActivity implements
         mPathNamesView.setAdapter(new PathNameView(pathNames != null ? Arrays.asList(pathNames) : new ArrayList<>()));
     }
 
+    private void setCurrentPath(String path) {
+        mCurrentPath = path;
+        mTxtCurrentPath.setText("Current Path: " + mCurrentPath);
+    }
+
     public class PathNameView extends RecyclerView.Adapter<PathNameView.ViewHolder> {
         private final List<String> mPathNames;
 
@@ -262,17 +301,47 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     //Installed EventBus for a single use because I have a personal vendetta against RecyclerView's implementation.
-    //(And also because this is a portfolio piece so I wanted to showcase good abstractions and generics for no actual reason.)
+    //(And also because this is a portfolio piece so I wanted to showcase abstractions and generics for no actual reason.)
     public static class ItemClickEvent extends GenericEvent<String> {
         public ItemClickEvent(String data) {
             super(data);
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onItemClick(ItemClickEvent event) {
-        mTxtCurrentPath.setText("Current Path: " + event.data());
-        mCurrentPath = event.data();
-        mEditor.load(event.data(), mMap);
+        Toast.makeText(this, (mDeletePath ? "Deleted " : "Loaded ") + event.data(), Toast.LENGTH_SHORT).show();
+        if (mDeletePath) {
+            if (event.data().equals(mCurrentPath))
+                setCurrentPath("");
+            deletePath(event.data());
+        } else {
+            setCurrentPath(event.data());
+            if (!mEditor.load(mCurrentPath, mMap))
+                onPathError(PathOperation.LOAD, mCurrentPath);
+        }
+    }
+
+    private void onPathError(PathOperation operation, String path) {
+        mEditor.clear();
+        deletePath(path);
+        if (mCurrentPath.equals(path))
+            setCurrentPath("");
+
+        new AlertDialog.Builder(this)
+            .setTitle("Error")
+            .setMessage("Failed to " + operation.toString().toLowerCase() + " " + path + ". " + path + " will now be deleted.")
+            .setPositiveButton("Ok", null)
+            .show();
+    }
+
+    private void deletePath(String path) {
+        FileUtils.create(path).delete();
+        updatePathNames(FileUtils.root().list());
+    }
+
+    private enum PathOperation {
+        SAVE,
+        LOAD
     }
 }

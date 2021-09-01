@@ -47,9 +47,13 @@ public class Boundary implements IPoint {
     }
 
     public void load(ArrayList<SerialPoint> points, GoogleMap map) {
-        mPolygon.clear();
+        clear();
         for (SerialPoint point : points)
             add(point.latLng(), map);
+    }
+
+    public void clear() {
+        mPolygon.clear();
     }
 
     public ArrayList<SerialPoint> points() {

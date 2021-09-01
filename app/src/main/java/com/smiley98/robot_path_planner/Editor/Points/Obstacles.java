@@ -58,14 +58,17 @@ public class Obstacles implements IPoint {
     }
 
     public void load(ArrayList<ArrayList<SerialPoint>> polygons, GoogleMap map) {
-        for (Polygon geometry : mPolygons.values())
-            geometry.clear();
-
+        clear();
         for (ArrayList<SerialPoint> polygon : polygons) {
             for (SerialPoint point : polygon)
                 add(point.latLng(), map);
             setState(State.NEW);
         }
+    }
+
+    public void clear() {
+        for (Polygon geometry : mPolygons.values())
+            geometry.clear();
     }
 
     public ArrayList<ArrayList<SerialPoint>> points() {

@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.smiley98.robot_path_planner.Editor.Common.SerialPoint;
 import com.smiley98.robot_path_planner.Editor.Common.Tag;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
@@ -15,6 +16,7 @@ import com.smiley98.robot_path_planner.Editor.Points.Obstacles;
 import com.smiley98.robot_path_planner.Editor.Points.Way;
 import com.smiley98.robot_path_planner.FileUtils;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Editor {
@@ -25,19 +27,31 @@ public class Editor {
         mObstacles = new Obstacles(obstaclesButton);
     }
 
-    public void save(String name, GoogleMap map) {
-        if (!mWay.points().isEmpty()) {
-            FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
-            map.clear();
-        } else
-            new AlertDialog.Builder(mWay.context()).setTitle("Error").setMessage("Cannot save path without way points.").setPositiveButton("Ok", null).show();
+    public boolean isEmpty() {
+        return mWay.points().isEmpty();
     }
 
-    public void load(String name, GoogleMap map) {
+    public boolean save(String name) {
+        boolean result = FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
+        clear();
+        return result;
+    }
+
+    public boolean load(String name, GoogleMap map) {
         EditorFile serial = FileUtils.deserialize(FileUtils.create(name));
-        mWay.load(serial.wayPoints(), map);
-        mBoundary.load(serial.boundaryPoints(), map);
-        mObstacles.load(serial.obstacles(), map);
+        if (serial != null) {
+            mWay.load(serial.wayPoints(), map);
+            mBoundary.load(serial.boundaryPoints(), map);
+            mObstacles.load(serial.obstacles(), map);
+            return true;
+        }
+        return false;
+    }
+
+    public void clear() {
+        mWay.clear();
+        mBoundary.clear();
+        mObstacles.clear();
     }
 
     //Add

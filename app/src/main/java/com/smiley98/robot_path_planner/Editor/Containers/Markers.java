@@ -62,6 +62,7 @@ public class Markers {
     }
 
     public void clear() {
+        mSelected = null;
         for (Marker marker : mMarkers)
             marker.remove();
         mMarkers.clear();

@@ -14,7 +14,6 @@ import com.smiley98.robot_path_planner.Editor.Points.Obstacles;
 import com.smiley98.robot_path_planner.Editor.Points.Way;
 import com.smiley98.robot_path_planner.FileUtils;
 
-import java.io.File;
 import java.util.Objects;
 
 public class Editor {

@@ -1,5 +1,8 @@
 package com.smiley98.robot_path_planner;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
@@ -12,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Toast;
 
@@ -40,6 +46,8 @@ public class MapsActivity extends FragmentActivity implements
     OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     private Editor mEditor;
+    private ActivityMapsBinding mBinding;
+
     private RecyclerView mPathNamesView;
     private AppCompatTextView mTxtCurrentPath;
     private String mCurrentPath = "";
@@ -54,40 +62,41 @@ public class MapsActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         Bus.register(this);
 
-        ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        mBinding = ActivityMapsBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        binding.btnSave.setOnClickListener(this);
-        binding.btnLoad.setOnClickListener(this);
-        FileUtils.init(this, binding.btnSave, binding.btnLoad);
-        binding.btnCreate.setOnClickListener(this);
-        binding.btnDelete.setOnClickListener(this);
+        mBinding.btnSave.setOnClickListener(this);
+        mBinding.btnLoad.setOnClickListener(this);
+        mBinding.btnCreate.setOnClickListener(this);
+        mBinding.btnDelete.setOnClickListener(this);
 
-        mTxtCurrentPath = binding.txtCurrentPath;
-        mPathNamesView = binding.rcvPaths;
+        mTxtCurrentPath = mBinding.txtCurrentPath;
+        mPathNamesView = mBinding.rcvPaths;
         mPathNamesView.setVisibility(View.INVISIBLE);
         mPathNamesView.setLayoutManager(new LinearLayoutManager(this));
         mPathNamesView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        updatePathNames(FileUtils.root().list());
 
-        mTxtEnterPath = binding.txtEnterPath;
-        mEdtEnterPath = binding.edtEnterPath;
-        mBtnPathOk = binding.btnPathOk;
+        //Must wait till adapter has been setup because requestExternalStorage manipulates the adapter.
+        requestExternalStorage();
+
+        mTxtEnterPath = mBinding.txtEnterPath;
+        mEdtEnterPath = mBinding.edtEnterPath;
+        mBtnPathOk = mBinding.btnPathOk;
         mBtnPathOk.setOnClickListener(this);
         for (View view : pathViews())
             view.setVisibility(View.INVISIBLE);
 
         ArrayList<AppCompatButton> pointButtons = new ArrayList<>();
-        pointButtons.add(binding.btnWay);
-        pointButtons.add(binding.btnBoundary);
-        pointButtons.add(binding.btnObstacle);
+        pointButtons.add(mBinding.btnWay);
+        pointButtons.add(mBinding.btnBoundary);
+        pointButtons.add(mBinding.btnObstacle);
         for (View view : pointButtons) {
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
         }
 
         //Accessing buttons as array reduces legibility in Editor. Only made array to shorten listener setters.
-        mEditor = new Editor(binding.btnWay, binding.btnBoundary, binding.btnObstacle);
+        mEditor = new Editor(mBinding.btnWay, mBinding.btnBoundary, mBinding.btnObstacle);
         SupportMapFragment mapFragment = (SupportMapFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentByTag("fragment_maps"));
         mapFragment.getMapAsync(this);
     }
@@ -234,11 +243,9 @@ public class MapsActivity extends FragmentActivity implements
     @Subscribe
     public void onItemClick(PathNameView.ItemClickEvent event) {
         Toast.makeText(this, (mDeletePath ? "Deleted " : "Loaded ") + event.data(), Toast.LENGTH_SHORT).show();
-        if (mDeletePath) {
-            if (event.data().equals(mCurrentPath))
-                setCurrentPath("");
+        if (mDeletePath)
             deletePath(event.data());
-        } else {
+        else {
             setCurrentPath(event.data());
             if (!mEditor.load(mCurrentPath, mMap))
                 onPathError(PathOperation.LOAD, mCurrentPath);
@@ -272,19 +279,20 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     private void onPathError(PathOperation operation, String path) {
-        mEditor.clear();
         deletePath(path);
-        if (mCurrentPath.equals(path))
-            setCurrentPath("");
-
         new AlertDialog.Builder(this)
             .setTitle("Error")
-            .setMessage("Failed to " + operation.toString().toLowerCase() + " " + path + ". " + path + " will now be deleted.")
+            .setMessage("Failed to " + operation.toString().toLowerCase() + " " + path + ". " + path + " has been deleted.")
             .setPositiveButton("Ok", null)
             .show();
     }
 
     private void deletePath(String path) {
+        if (path.equals(mCurrentPath)) {
+            setCurrentPath("");
+            mEditor.clear();
+        }
+
         FileUtils.create(path).delete();
         updatePathNames(FileUtils.root().list());
     }
@@ -292,5 +300,37 @@ public class MapsActivity extends FragmentActivity implements
     private enum PathOperation {
         SAVE,
         LOAD
+    }
+
+    private void requestExternalStorage() {
+        ActivityResultLauncher<Intent> intent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            (ActivityResult result) -> {
+                boolean granted = Environment.isExternalStorageManager();
+                mBinding.btnSave.setEnabled(granted);
+                mBinding.btnLoad.setEnabled(granted);
+                mBinding.btnCreate.setEnabled(granted);
+                mBinding.btnDelete.setEnabled(granted);
+
+                if (granted)
+                    onExternalStorageGranted();
+                else {
+                    new AlertDialog.Builder(this)
+                        .setTitle("Error")
+                        .setMessage("External storage access denied. Saving and loading has been disabled.")
+                        .setPositiveButton("Ok", null)
+                        .show();
+                }
+            }
+        );
+
+        if (!Environment.isExternalStorageManager())
+            intent.launch(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+        else
+            onExternalStorageGranted();
+    }
+
+    private void onExternalStorageGranted() {
+        FileUtils.root().mkdirs();
+        updatePathNames(FileUtils.root().list());
     }
 }

@@ -1,7 +1,5 @@
 package com.smiley98.robot_path_planner.Editor.Points;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 

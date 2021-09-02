@@ -17,23 +17,6 @@ import java.util.Objects;
 public class Markers {
     public Markers(Type type) { mType = type; }
 
-    public Type type() { return mType; }
-    public Marker selected() { return mSelected; }
-    public Marker get(int index) { return mMarkers.get(index); }
-    public int size() { return mMarkers.size(); }
-
-    public void setSelected(@Nullable Marker marker) {
-        //Revert previously selected icon.
-        if (mSelected != null)
-            mSelected.setIcon(Icons.normal(mType));
-
-        mSelected = marker;
-
-        //Update newly selected icon.
-        if (mSelected != null)
-            mSelected.setIcon(Icons.selected(mType));
-    }
-
     public void add(LatLng latlng, GoogleMap map) {
         Marker marker = Objects.requireNonNull(map.addMarker(new MarkerOptions().position(latlng).icon(Icons.normal(mType)).anchor(0.5f, 0.5f)));
         marker.setTag(new Tag(mType));
@@ -68,10 +51,16 @@ public class Markers {
         mMarkers.clear();
     }
 
-    private void remove(@NonNull Marker marker) {
-        setSelected(previous(marker));
-        mMarkers.remove(marker);
-        marker.remove();
+    public void setSelected(@Nullable Marker marker) {
+        //Revert previously selected icon.
+        if (mSelected != null)
+            mSelected.setIcon(Icons.normal(mType));
+
+        mSelected = marker;
+
+        //Update newly selected icon.
+        if (mSelected != null)
+            mSelected.setIcon(Icons.selected(mType));
     }
 
     public ArrayList<LatLng> points() {
@@ -79,6 +68,15 @@ public class Markers {
         for (Marker marker : mMarkers)
             result.add(marker.getPosition());
         return result;
+    }
+
+    public Type type() { return mType; }
+    public int size() { return mMarkers.size(); }
+
+    private void remove(@NonNull Marker marker) {
+        setSelected(previous(marker));
+        mMarkers.remove(marker);
+        marker.remove();
     }
 
     private Marker previous(@Nullable Marker marker) {

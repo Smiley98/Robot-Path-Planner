@@ -6,12 +6,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -44,18 +41,11 @@ import java.util.Objects;
 public class MapsActivity extends FragmentActivity implements
     View.OnClickListener, View.OnLongClickListener,
     OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
+    private ActivityMapsBinding mBinding;
     private GoogleMap mMap;
     private Editor mEditor;
-    private ActivityMapsBinding mBinding;
-
-    private RecyclerView mPathNamesView;
-    private AppCompatTextView mTxtCurrentPath;
     private String mCurrentPath = "";
     private boolean mDeletePath = false;
-
-    private AppCompatTextView mTxtEnterPath;
-    private AppCompatEditText mEdtEnterPath;
-    private AppCompatButton mBtnPathOk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,25 +54,18 @@ public class MapsActivity extends FragmentActivity implements
 
         mBinding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+        requestExternalStorage();
 
         mBinding.btnSave.setOnClickListener(this);
         mBinding.btnLoad.setOnClickListener(this);
         mBinding.btnCreate.setOnClickListener(this);
         mBinding.btnDelete.setOnClickListener(this);
 
-        mTxtCurrentPath = mBinding.txtCurrentPath;
-        mPathNamesView = mBinding.rcvPaths;
-        mPathNamesView.setVisibility(View.INVISIBLE);
-        mPathNamesView.setLayoutManager(new LinearLayoutManager(this));
-        mPathNamesView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        mBinding.rcvPaths.setVisibility(View.INVISIBLE);
+        mBinding.rcvPaths.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.rcvPaths.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        //Must wait till adapter has been setup because requestExternalStorage manipulates the adapter.
-        requestExternalStorage();
-
-        mTxtEnterPath = mBinding.txtEnterPath;
-        mEdtEnterPath = mBinding.edtEnterPath;
-        mBtnPathOk = mBinding.btnPathOk;
-        mBtnPathOk.setOnClickListener(this);
+        mBinding.btnPathOk.setOnClickListener(this);
         for (View view : pathViews())
             view.setVisibility(View.INVISIBLE);
 
@@ -139,23 +122,23 @@ public class MapsActivity extends FragmentActivity implements
             case R.id.btnCreate:
                 mDeletePath = false;
                 show(pathViews(), true);
-                show(mPathNamesView, false);
+                show(mBinding.rcvPaths, false);
                 break;
 
             case R.id.btnDelete:
                 mDeletePath = true;
                 show(pathViews(), false);
-                show(mPathNamesView, true);
+                show(mBinding.rcvPaths, true);
                 break;
 
             case R.id.btnPathOk:
                 //Verify entered path isn't a duplicate.
                 String[] pathNames = FileUtils.root().list();
-                String pathText = mEdtEnterPath.getText().toString() + ".path";
+                String pathText = mBinding.edtEnterPath.getText().toString() + ".path";
                 if (pathNames != null) {
                     for (String path : pathNames) {
                         if (path.equals(pathText)) {
-                            mEdtEnterPath.setError(path + " already exists");
+                            mBinding.edtEnterPath.setError(path + " already exists");
                             return;
                         }
                     }
@@ -182,7 +165,7 @@ public class MapsActivity extends FragmentActivity implements
                         .show();
                 } else {
                     if (!mEditor.isEmpty()) {
-                        show(mPathNamesView, false);
+                        show(mBinding.rcvPaths, false);
                         show(pathViews(), false);
                         mEditor.save(mCurrentPath);
                         Toast.makeText(this, "Saved " + mCurrentPath, Toast.LENGTH_SHORT).show();
@@ -198,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements
             case R.id.btnLoad:
                 pathNames = FileUtils.root().list();
                 if (pathNames != null && pathNames.length != 0)
-                    show(mPathNamesView, true);
+                    show(mBinding.rcvPaths, true);
                 else
                     new AlertDialog.Builder(this)
                         .setTitle("Warning")
@@ -254,9 +237,9 @@ public class MapsActivity extends FragmentActivity implements
 
     private ArrayList<View> pathViews() {
         ArrayList<View> views = new ArrayList<>();
-        views.add(mTxtEnterPath);
-        views.add(mEdtEnterPath);
-        views.add(mBtnPathOk);
+        views.add(mBinding.txtEnterPath);
+        views.add(mBinding.edtEnterPath);
+        views.add(mBinding.btnPathOk);
         return views;
     }
 
@@ -270,12 +253,12 @@ public class MapsActivity extends FragmentActivity implements
     }
 
     private void updatePathNames(@Nullable String[] pathNames) {
-        mPathNamesView.setAdapter(new PathNameView(pathNames != null ? Arrays.asList(pathNames) : new ArrayList<>()));
+        mBinding.rcvPaths.setAdapter(new PathNameView(pathNames != null ? Arrays.asList(pathNames) : new ArrayList<>()));
     }
 
     private void setCurrentPath(String path) {
         mCurrentPath = path;
-        mTxtCurrentPath.setText("Current Path: " + mCurrentPath);
+        mBinding.txtCurrentPath.setText("Current Path: " + mCurrentPath);
     }
 
     private void onPathError(PathOperation operation, String path) {

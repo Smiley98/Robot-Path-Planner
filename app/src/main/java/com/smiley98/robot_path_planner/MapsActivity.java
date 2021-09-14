@@ -112,7 +112,7 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         mEditor.onMarkerClick(marker);
-        return false;
+        return true;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -220,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements
                 mEditor.onPointButtonLongClick(Type.OBSTACLE);
                 break;
         }
-        return false;
+        return true;
     }
 
     @Subscribe

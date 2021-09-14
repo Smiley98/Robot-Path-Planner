@@ -6,31 +6,30 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.R;
 
 import java.util.List;
 
-public class Polygon {
+public class Polygon extends Markers {
 
     public Polygon(Type type) {
-        mMarkers  = new Markers(type);
+        super(type);
         mId = ++sId;
     }
 
     public void add(@NonNull LatLng latLng, GoogleMap map, Context context) {
-        mMarkers.add(mId, latLng, map);
+        super.add(mId, latLng, map);
         if (mPolygon == null)
             mPolygon = map.addPolygon(options(context).add(latLng));
         else
-            mPolygon.setPoints(mMarkers.points());
+            mPolygon.setPoints(points());
     }
 
     public void remove() {
-        mMarkers.remove();
-        List<LatLng> points = mMarkers.points();
+        super.remove();
+        List<LatLng> points = points();
 
         if (!points.isEmpty())
             mPolygon.setPoints(points);
@@ -41,23 +40,15 @@ public class Polygon {
     }
 
     public void clear() {
+        super.clear();
         if (mPolygon != null)
             mPolygon.remove();
         mPolygon = null;
-        mMarkers.clear();
     }
-
-
-    public void setSelected(@NonNull Marker marker) {
-        mMarkers.setSelected(marker);
-    }
-    public List<LatLng> points() { return mMarkers.points(); }
 
     public int id() { return mId; }
-    public int size() { return mMarkers.size(); }
 
     private com.google.android.gms.maps.model.Polygon mPolygon;
-    private final Markers mMarkers;
     private final int mId;
 
     private static int sId = 0;
@@ -65,7 +56,7 @@ public class Polygon {
     private PolygonOptions options(Context context) {
         PolygonOptions result = new PolygonOptions();
 
-        switch (mMarkers.type()) {
+        switch (type()) {
             case WAY:
                 result.fillColor(context.getColor(R.color.cyan_50));
                 result.strokeColor(context.getColor(R.color.cyan));

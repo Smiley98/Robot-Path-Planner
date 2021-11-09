@@ -55,6 +55,7 @@ public class Way implements IPoint {
     }
 
     public void clear() {
+        setState(State.ADD);
         mMarkers.clear();
         mLines.clear();
     }
@@ -65,6 +66,8 @@ public class Way implements IPoint {
             result.add(new SerialPoint(latLng));
         return result;
     }
+
+    public int size() { return mMarkers.size(); }
 
     private void setState(State state) {
         switch (state) {

@@ -144,7 +144,7 @@ public class MapsActivity extends FragmentActivity implements
 
                 //Attempt to save previous path.
                 if (!mCurrentPath.isEmpty() && !mEditor.save(mCurrentPath))
-                    onPathError(PathOperation.SAVE, mCurrentPath);
+                    onPathError(Action.SAVE, mCurrentPath);
 
                 //Create path, select it, and notify user.
                 setCurrentPath(pathText);
@@ -166,8 +166,10 @@ public class MapsActivity extends FragmentActivity implements
                     if (!mEditor.isEmpty()) {
                         show(mBinding.rcvPaths, false);
                         show(pathViews(), false);
-                        mEditor.save(mCurrentPath);
-                        Toast.makeText(this, "Saved " + mCurrentPath, Toast.LENGTH_SHORT).show();
+                        if (mEditor.save(mCurrentPath))
+                            Toast.makeText(this, "Saved " + mCurrentPath, Toast.LENGTH_SHORT).show();
+                        else
+                            onPathError(mAction, mCurrentPath);
                     } else
                         new androidx.appcompat.app.AlertDialog.Builder(this)
                             .setTitle("Error")
@@ -235,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements
             case LOAD:
                 setCurrentPath(event.data());
                 if (!mEditor.load(mCurrentPath, mMap))
-                    onPathError(PathOperation.LOAD, mCurrentPath);
+                    onPathError(Action.LOAD, mCurrentPath);
                 break;
         }
     }
@@ -266,11 +268,11 @@ public class MapsActivity extends FragmentActivity implements
         mBinding.txtCurrentPath.setText("Current Path: " + mCurrentPath);
     }
 
-    private void onPathError(PathOperation operation, String path) {
+    private void onPathError(Action action, String path) {
         deletePath(path);
         new AlertDialog.Builder(this)
             .setTitle("Error")
-            .setMessage("Failed to " + operation.toString().toLowerCase() + " " + path + ". " + path + " has been deleted.")
+            .setMessage("Failed to " + action.toString().toLowerCase() + " " + path + ". " + path + " has been deleted.")
             .setPositiveButton("Ok", null)
             .show();
     }
@@ -283,11 +285,6 @@ public class MapsActivity extends FragmentActivity implements
 
         FileUtils.create(path).delete();
         updatePathNames(FileUtils.root().list());
-    }
-
-    private enum PathOperation {
-        SAVE,
-        LOAD
     }
 
     private void requestExternalStorage() {

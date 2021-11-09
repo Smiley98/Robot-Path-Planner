@@ -1,13 +1,11 @@
 package com.smiley98.robot_path_planner.Editor;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.smiley98.robot_path_planner.Editor.Common.SerialPoint;
 import com.smiley98.robot_path_planner.Editor.Common.Tag;
 import com.smiley98.robot_path_planner.Editor.Common.Type;
 import com.smiley98.robot_path_planner.Editor.Interfaces.IPoint;
@@ -16,8 +14,6 @@ import com.smiley98.robot_path_planner.Editor.Points.Obstacles;
 import com.smiley98.robot_path_planner.Editor.Points.Way;
 import com.smiley98.robot_path_planner.FileUtils;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Editor {
@@ -29,22 +25,22 @@ public class Editor {
     }
 
     public boolean isEmpty() {
-        return mWay.points().isEmpty();
+        return mWay.size() == 0;
     }
 
     public boolean save(String name) {
-        boolean result = FileUtils.serialize(new File(FileUtils.root(), name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
+        boolean result = FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
         clear();
         return result;
     }
 
     public boolean load(String name, GoogleMap map) {
-        EditorFile serial = FileUtils.deserialize(new File(FileUtils.root(), name));
+        EditorFile serial = FileUtils.deserialize(FileUtils.create(name));
         if (serial != null) {
             mWay.load(serial.wayPoints(), map);
             mBoundary.load(serial.boundaryPoints(), map);
             mObstacles.load(serial.obstacles(), map);
-            return true;
+            return !isEmpty();
         }
         return false;
     }

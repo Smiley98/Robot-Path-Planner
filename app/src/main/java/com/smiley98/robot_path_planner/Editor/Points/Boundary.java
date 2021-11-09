@@ -53,6 +53,7 @@ public class Boundary implements IPoint {
     }
 
     public void clear() {
+        setState(State.ADD);
         mPolygon.clear();
     }
 

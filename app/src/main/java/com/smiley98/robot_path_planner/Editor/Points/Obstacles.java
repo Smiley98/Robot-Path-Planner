@@ -62,11 +62,11 @@ public class Obstacles implements IPoint {
         for (ArrayList<SerialPoint> polygon : polygons) {
             for (SerialPoint point : polygon)
                 add(point.latLng(), map);
-            setState(State.NEW);
         }
     }
 
     public void clear() {
+        setState(State.NEW);
         for (Polygon geometry : mPolygons.values())
             geometry.clear();
     }

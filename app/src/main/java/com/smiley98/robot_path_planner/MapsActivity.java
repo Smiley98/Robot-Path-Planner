@@ -45,7 +45,7 @@ public class MapsActivity extends FragmentActivity implements
     private GoogleMap mMap;
     private Editor mEditor;
     private String mCurrentPath = "";
-    private boolean mDeletePath = false;
+    private Action mAction = Action.CREATE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +60,12 @@ public class MapsActivity extends FragmentActivity implements
         mBinding.btnLoad.setOnClickListener(this);
         mBinding.btnCreate.setOnClickListener(this);
         mBinding.btnDelete.setOnClickListener(this);
+        mBinding.btnPathOk.setOnClickListener(this);
 
-        mBinding.rcvPaths.setVisibility(View.INVISIBLE);
+        show(pathViews(), false);
+        show(mBinding.rcvPaths, false);
         mBinding.rcvPaths.setLayoutManager(new LinearLayoutManager(this));
         mBinding.rcvPaths.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        mBinding.btnPathOk.setOnClickListener(this);
-        for (View view : pathViews())
-            view.setVisibility(View.INVISIBLE);
 
         ArrayList<AppCompatButton> pointButtons = new ArrayList<>();
         pointButtons.add(mBinding.btnWay);
@@ -120,13 +118,13 @@ public class MapsActivity extends FragmentActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnCreate:
-                mDeletePath = false;
+                mAction = Action.CREATE;
                 show(pathViews(), true);
                 show(mBinding.rcvPaths, false);
                 break;
 
             case R.id.btnDelete:
-                mDeletePath = true;
+                mAction = Action.DELETE;
                 show(pathViews(), false);
                 show(mBinding.rcvPaths, true);
                 break;
@@ -157,6 +155,7 @@ public class MapsActivity extends FragmentActivity implements
                 break;
 
             case R.id.btnSave:
+                mAction = Action.SAVE;
                 if (mCurrentPath.isEmpty()) {
                     new AlertDialog.Builder(this)
                         .setTitle("Warning")
@@ -179,6 +178,7 @@ public class MapsActivity extends FragmentActivity implements
                 break;
 
             case R.id.btnLoad:
+                mAction = Action.LOAD;
                 pathNames = FileUtils.root().list();
                 if (pathNames != null && pathNames.length != 0)
                     show(mBinding.rcvPaths, true);
@@ -223,15 +223,20 @@ public class MapsActivity extends FragmentActivity implements
         return true;
     }
 
+    //Only applies to delete and load, but create and save exist in case we ever need that state.
     @Subscribe
     public void onItemClick(PathNameView.ItemClickEvent event) {
-        Toast.makeText(this, (mDeletePath ? "Deleted " : "Loaded ") + event.data(), Toast.LENGTH_SHORT).show();
-        if (mDeletePath)
-            deletePath(event.data());
-        else {
-            setCurrentPath(event.data());
-            if (!mEditor.load(mCurrentPath, mMap))
-                onPathError(PathOperation.LOAD, mCurrentPath);
+        Toast.makeText(this, (mAction == Action.DELETE ? "Deleted " : "Loaded ") + event.data(), Toast.LENGTH_SHORT).show();
+        switch (mAction) {
+            case DELETE:
+                deletePath(event.data());
+                break;
+
+            case LOAD:
+                setCurrentPath(event.data());
+                if (!mEditor.load(mCurrentPath, mMap))
+                    onPathError(PathOperation.LOAD, mCurrentPath);
+                break;
         }
     }
 
@@ -315,5 +320,12 @@ public class MapsActivity extends FragmentActivity implements
     private void onExternalStorageGranted() {
         FileUtils.root().mkdirs();
         updatePathNames(FileUtils.root().list());
+    }
+
+    private enum Action {
+        CREATE,
+        DELETE,
+        SAVE,
+        LOAD
     }
 }

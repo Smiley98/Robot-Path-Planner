@@ -16,6 +16,7 @@ import com.smiley98.robot_path_planner.Editor.Points.Obstacles;
 import com.smiley98.robot_path_planner.Editor.Points.Way;
 import com.smiley98.robot_path_planner.FileUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -32,13 +33,13 @@ public class Editor {
     }
 
     public boolean save(String name) {
-        boolean result = FileUtils.serialize(FileUtils.create(name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
+        boolean result = FileUtils.serialize(new File(FileUtils.root(), name), new EditorFile(mWay.points(), mBoundary.points(), mObstacles.points()));
         clear();
         return result;
     }
 
     public boolean load(String name, GoogleMap map) {
-        EditorFile serial = FileUtils.deserialize(FileUtils.create(name));
+        EditorFile serial = FileUtils.deserialize(new File(FileUtils.root(), name));
         if (serial != null) {
             mWay.load(serial.wayPoints(), map);
             mBoundary.load(serial.boundaryPoints(), map);
